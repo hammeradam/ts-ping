@@ -1,4 +1,4 @@
-import { Ping } from './ping.js'
+import { Ping } from './ping.ts'
 
 // Example usage of the Ping library
 

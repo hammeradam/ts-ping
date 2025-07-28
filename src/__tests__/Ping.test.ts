@@ -32,11 +32,10 @@ describe('ping', () => {
       expect(ping.intervalInSeconds).toBe(1.0)
       expect(ping.packetSizeInBytes).toBe(56)
       expect(ping.ttl).toBe(64)
-      expect(ping.showLostPackets).toBe(true)
     })
 
     it('should create a Ping instance with custom values', () => {
-      const ping = new Ping('example.com', 10, 3, 2.0, 128, 32, false)
+      const ping = new Ping('example.com', 10, 3, 2.0, 128, 32)
 
       expect(ping.hostname).toBe('example.com')
       expect(ping.timeoutInSeconds).toBe(10)
@@ -44,7 +43,6 @@ describe('ping', () => {
       expect(ping.intervalInSeconds).toBe(2.0)
       expect(ping.packetSizeInBytes).toBe(128)
       expect(ping.ttl).toBe(32)
-      expect(ping.showLostPackets).toBe(false)
     })
   })
 
@@ -90,13 +88,6 @@ describe('ping', () => {
       expect(ping.ttl).toBe(32)
     })
 
-    it('should set show lost packets and return this', () => {
-      const result = ping.setShowLostPackets(false)
-
-      expect(result).toBe(ping)
-      expect(ping.showLostPackets).toBe(false)
-    })
-
     it('should allow method chaining', () => {
       const result = ping
         .setTimeout(10)
@@ -104,7 +95,6 @@ describe('ping', () => {
         .setInterval(2.0)
         .setPacketSize(128)
         .setTtl(32)
-        .setShowLostPackets(false)
 
       expect(result).toBe(ping)
       expect(ping.timeoutInSeconds).toBe(10)
@@ -112,7 +102,6 @@ describe('ping', () => {
       expect(ping.intervalInSeconds).toBe(2.0)
       expect(ping.packetSizeInBytes).toBe(128)
       expect(ping.ttl).toBe(32)
-      expect(ping.showLostPackets).toBe(false)
     })
   })
 
@@ -127,7 +116,6 @@ describe('ping', () => {
         '1',
         '-W',
         '5',
-        '-O',
         'google.com',
       ])
     })
@@ -142,7 +130,6 @@ describe('ping', () => {
         '3',
         '-W',
         '10',
-        '-O',
         'google.com',
       ])
     })
@@ -169,22 +156,6 @@ describe('ping', () => {
 
       expect(command).toContain('-t')
       expect(command).toContain('32')
-    })
-
-    it('should include show lost packets option on non-macOS when enabled', () => {
-      mockOs.platform.mockReturnValue('linux')
-      const ping = new Ping('google.com').setShowLostPackets(true)
-      const command = ping.buildPingCommand()
-
-      expect(command).toContain('-O')
-    })
-
-    it('should not include show lost packets option on macOS', () => {
-      mockOs.platform.mockReturnValue('darwin')
-      const ping = new Ping('google.com').setShowLostPackets(true)
-      const command = ping.buildPingCommand()
-
-      expect(command).not.toContain('-O')
     })
 
     it('should use milliseconds for timeout on macOS', () => {
@@ -324,7 +295,7 @@ describe('ping', () => {
 
       expect(mockSpawnSync).toHaveBeenCalledWith(
         'ping',
-        ['-c', '1', '-W', '5', '-O', 'google.com'],
+        ['-c', '1', '-W', '5', 'google.com'],
         expect.objectContaining({
           encoding: 'utf-8',
           timeout: expect.any(Number),

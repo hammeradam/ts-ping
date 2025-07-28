@@ -12,7 +12,7 @@ A modern TypeScript library for performing ICMP ping operations with type-safe r
 
 - 🎯 **Type-Safe**: Built with TypeScript and discriminated union types for reliable type checking
 - 🔧 **Fluent Interface**: Chainable methods for easy configuration
-- 🌍 **Cross-Platform**: Works on macOS and Linux with platform-specific optimizations
+- 🌍 **Cross-Platform**: Works on Windows, macOS, and Linux with platform-specific optimizations
 - 📊 **Comprehensive Results**: Detailed ping statistics including packet loss, timing, and error information
 - 🌊 **Streaming Support**: Real-time ping monitoring with async generators and advanced utilities
 - 📈 **Live Statistics**: Rolling statistics calculation with jitter, packet loss, and performance metrics
@@ -154,8 +154,7 @@ new Ping(
   count?: number,
   intervalInSeconds?: number,
   packetSizeInBytes?: number,
-  ttl?: number,
-  showLostPackets?: boolean
+  ttl?: number
 )
 ```
 
@@ -166,7 +165,6 @@ new Ping(
 - `intervalInSeconds` - Interval between pings in seconds (default: 1.0)
 - `packetSizeInBytes` - Size of ping packets in bytes (default: 56)
 - `ttl` - Time To Live value (default: 64)
-- `showLostPackets` - Show lost packets in output (default: true, Linux only)
 
 #### Fluent Interface Methods
 
@@ -178,7 +176,6 @@ ping.setCount(5) // Set number of pings
 ping.setInterval(2.0) // Set interval between pings
 ping.setPacketSize(128) // Set packet size in bytes
 ping.setTtl(32) // Set Time To Live
-ping.setShowLostPackets(false) // Enable/disable lost packet reporting
 ```
 
 #### Method Chaining Example
@@ -732,7 +729,6 @@ const ping = new Ping('example.com')
   .setInterval(2.0) // 2 second interval
   .setPacketSize(128) // 128 byte packets
   .setTtl(32) // TTL of 32
-  .setShowLostPackets(true) // Show lost packets (Linux only)
 
 const result = ping.run()
 
@@ -799,13 +795,18 @@ if (result.isFailure()) {
 
 ## Platform Support
 
+### Windows
+- Uses `-n` instead of `-c` for ping count
+- Uses `-w` (lowercase) for timeout in milliseconds
+- Uses `-l` for packet size instead of `-s`
+- Uses `-i` for TTL instead of `-t`
+- Does not support custom intervals (handled by streaming interval timing)
+
 ### macOS
 - Uses milliseconds for timeout values (`-W 5000`)
-- Does not support the `-O` (show lost packets) option
 
 ### Linux
 - Uses seconds for timeout values (`-W 5`)
-- Supports the `-O` option for showing lost packets
 
 The library automatically detects the platform and adjusts command parameters accordingly.
 
@@ -871,7 +872,7 @@ pnpm run lint:fix        # Fix linting issues automatically
 - Node.js 20+
 - pnpm 8+ (recommended) or npm/yarn
 - TypeScript 5+
-- macOS or Linux (ping command must be available)
+- macOS, Linux, or Windows (ping command must be available)
 
 ## License
 
@@ -883,11 +884,19 @@ Contributions are welcome! Please read the contributing guidelines and ensure al
 
 ## Changelog
 
+### v1.2.0 (2025-07-28)
+- 🪟 **Enhanced Windows Support**: Improved Windows compatibility with correct ping command arguments
+- 🔧 **Platform-Specific Commands**: Windows uses `-n` for count, `-w` for timeout, `-l` for packet size, `-i` for TTL
+- 🧹 **Code Cleanup**: Removed non-existent `-O` flag functionality
+- ✅ **Comprehensive Testing**: Added dedicated Windows support tests with platform detection
+- 📚 **Updated Documentation**: Clarified platform-specific ping command differences
+
 ### v1.1.0 (2025-07-28)
 - 🌊 **New Streaming Support**: Added async generator-based streaming for real-time ping monitoring
 - 📈 **PingStream Utilities**: Advanced stream processing with filtering, mapping, windowing, and statistics
 - 📊 **Rolling Statistics**: Live calculation of latency, jitter, packet loss, and performance metrics
 - 🔄 **Memory Efficient**: Generator-based streaming that doesn't load all results into memory
+- 🪟 **Windows Support**: Full Windows compatibility with platform-specific ping command handling
 - 🎯 **Type-Safe Streams**: Full TypeScript support for async generators and streaming operations
 - 🧰 **Stream Utilities**: `combineAsyncIterators`, batching, filtering, and transformation utilities
 - 📚 **Enhanced Documentation**: Comprehensive examples for streaming and real-time monitoring
@@ -897,7 +906,7 @@ Contributions are welcome! Please read the contributing guidelines and ensure al
 - 🎉 Initial release with TypeScript support
 - ✨ Discriminated union types for type-safe results
 - 🔄 Fluent interface for configuration
-- 🌍 Cross-platform support (macOS/Linux)
+- 🌍 Cross-platform support (Windows/macOS/Linux)
 - ⚡ Async support with `runAsync()` method
 - 🧪 Comprehensive test suite with 94%+ coverage
 - 📚 Complete documentation with examples

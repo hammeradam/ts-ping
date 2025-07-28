@@ -13,7 +13,7 @@ This project adheres to a code of conduct that all contributors are expected to 
 - Node.js 20 or higher
 - pnpm 8 or higher (recommended) or npm
 - TypeScript 5+
-- macOS or Linux (for testing ping functionality)
+- macOS, Linux, or Windows (for testing ping functionality)
 
 ### Development Setup
 
@@ -156,7 +156,7 @@ Documentation improvements are always welcome:
 - **Type Safety**: Leverage TypeScript's type system
 - **Immutability**: Readonly properties where possible
 - **Fluent Interface**: Method chaining for configuration
-- **Cross-Platform**: Support both macOS and Linux
+- **Cross-Platform**: Support Windows, macOS, and Linux
 - **Async Support**: Both sync and async execution modes
 
 ## Release Process

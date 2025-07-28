@@ -10,7 +10,6 @@ export class Ping {
   public intervalInSeconds: number
   public packetSizeInBytes: number
   public ttl: number
-  public showLostPackets: boolean
   private currentCommand: string[]
 
   constructor(
@@ -20,7 +19,6 @@ export class Ping {
     intervalInSeconds: number = 1.0,
     packetSizeInBytes: number = 56,
     ttl: number = 64,
-    showLostPackets: boolean = true,
   ) {
     this.hostname = hostname
     this.timeoutInSeconds = timeoutInSeconds
@@ -28,7 +26,6 @@ export class Ping {
     this.intervalInSeconds = intervalInSeconds
     this.packetSizeInBytes = packetSizeInBytes
     this.ttl = ttl
-    this.showLostPackets = showLostPackets
     this.currentCommand = []
   }
 
@@ -188,7 +185,6 @@ export class Ping {
       this.intervalInSeconds,
       this.packetSizeInBytes,
       this.ttl,
-      this.showLostPackets,
     )
 
     return await singlePing.runAsync()
@@ -300,11 +296,6 @@ export class Ping {
     return this
   }
 
-  setShowLostPackets(show: boolean = true): Ping {
-    this.showLostPackets = show
-    return this
-  }
-
   buildPingCommand(): string[] {
     return this.startWithPingCommand()
       .addPacketCountOption()
@@ -312,7 +303,6 @@ export class Ping {
       .addOptionalIntervalOption()
       .addOptionalPacketSizeOption()
       .addOptionalTtlOption()
-      .addOptionalShowLostPacketsOption()
       .addTargetHostname()
       .getCommand()
   }
@@ -327,23 +317,34 @@ export class Ping {
   }
 
   addPacketCountOption(): Ping {
-    this.currentCommand.push('-c', String(this.count))
+    if (this.isRunningOnWindows()) {
+      this.currentCommand.push('-n', String(this.count))
+    }
+    else {
+      this.currentCommand.push('-c', String(this.count))
+    }
     return this
   }
 
   addTimeoutOption(): Ping {
-    this.currentCommand.push('-W')
-    if (this.isRunningOnMacOS()) {
-      this.currentCommand.push(String(this.convertTimeoutToMilliseconds()))
+    if (this.isRunningOnWindows()) {
+      this.currentCommand.push('-w', String(this.convertTimeoutToMilliseconds()))
     }
     else {
-      this.currentCommand.push(String(this.timeoutInSeconds))
+      this.currentCommand.push('-W')
+      if (this.isRunningOnMacOS()) {
+        this.currentCommand.push(String(this.convertTimeoutToMilliseconds()))
+      }
+      else {
+        this.currentCommand.push(String(this.timeoutInSeconds))
+      }
     }
     return this
   }
 
   addOptionalIntervalOption(): Ping {
-    if (this.intervalInSeconds !== 1.0) {
+    // Windows doesn't support custom intervals in the same way
+    if (this.intervalInSeconds !== 1.0 && !this.isRunningOnWindows()) {
       this.currentCommand.push('-i', String(this.intervalInSeconds))
     }
     return this
@@ -351,21 +352,24 @@ export class Ping {
 
   addOptionalPacketSizeOption(): Ping {
     if (this.packetSizeInBytes !== 56) {
-      this.currentCommand.push('-s', String(this.packetSizeInBytes))
+      if (this.isRunningOnWindows()) {
+        this.currentCommand.push('-l', String(this.packetSizeInBytes))
+      }
+      else {
+        this.currentCommand.push('-s', String(this.packetSizeInBytes))
+      }
     }
     return this
   }
 
   addOptionalTtlOption(): Ping {
     if (this.ttl !== 64) {
-      this.currentCommand.push('-t', String(this.ttl))
-    }
-    return this
-  }
-
-  addOptionalShowLostPacketsOption(): Ping {
-    if (this.showLostPackets && !this.isRunningOnMacOS()) {
-      this.currentCommand.push('-O')
+      if (this.isRunningOnWindows()) {
+        this.currentCommand.push('-i', String(this.ttl))
+      }
+      else {
+        this.currentCommand.push('-t', String(this.ttl))
+      }
     }
     return this
   }
@@ -377,6 +381,10 @@ export class Ping {
 
   isRunningOnMacOS(): boolean {
     return os.platform() === 'darwin'
+  }
+
+  isRunningOnWindows(): boolean {
+    return os.platform() === 'win32'
   }
 
   convertTimeoutToMilliseconds(): number {

@@ -20,7 +20,14 @@ A modern TypeScript library for performing ICMP ping operations with type-safe r
 ## Installation
 
 ```bash
+# Using pnpm (recommended)
+pnpm add ts-ping
+
+# Using npm
 npm install ts-ping
+
+# Using yarn
+yarn add ts-ping
 ```
 
 ## Quick Start
@@ -395,26 +402,28 @@ function handlePingResult(result: PingResult) {
 ### Building
 
 ```bash
-npm run build
+pnpm run build
 ```
 
 ### Testing
 
 ```bash
-npm test                # Run all tests
-npm run test:watch      # Run tests in watch mode
+pnpm test                # Run all tests
+pnpm run test:watch      # Run tests in watch mode
+pnpm run test:coverage   # Run tests with coverage
 ```
 
 ### Linting
 
 ```bash
-npm run lint            # Check for linting issues
-npm run lint:fix        # Fix linting issues automatically
+pnpm run lint            # Check for linting issues
+pnpm run lint:fix        # Fix linting issues automatically
 ```
 
 ## Requirements
 
 - Node.js 18+ 
+- pnpm 8+ (recommended) or npm/yarn
 - TypeScript 5+
 - macOS or Linux (ping command must be available)
 

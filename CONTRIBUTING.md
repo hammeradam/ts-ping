@@ -11,7 +11,7 @@ This project adheres to a code of conduct that all contributors are expected to 
 ### Prerequisites
 
 - Node.js 18 or higher
-- npm or pnpm
+- pnpm 8 or higher (recommended) or npm
 - TypeScript 5+
 - macOS or Linux (for testing ping functionality)
 
@@ -25,11 +25,11 @@ This project adheres to a code of conduct that all contributors are expected to 
    ```
 3. Install dependencies:
    ```bash
-   npm install
+   pnpm install
    ```
 4. Run tests to ensure everything works:
    ```bash
-   npm test
+   pnpm test
    ```
 
 ## Development Workflow
@@ -38,29 +38,29 @@ This project adheres to a code of conduct that all contributors are expected to 
 
 ```bash
 # Run all tests
-npm test
+pnpm test
 
 # Run tests in watch mode
-npm run test:watch
+pnpm run test:watch
 
 # Run tests with coverage
-npm test -- --coverage
+pnpm run test:coverage
 ```
 
 ### Building
 
 ```bash
-npm run build
+pnpm run build
 ```
 
 ### Linting
 
 ```bash
 # Check for issues
-npm run lint
+pnpm run lint
 
 # Fix automatically fixable issues
-npm run lint:fix
+pnpm run lint:fix
 ```
 
 ## Making Changes
@@ -108,9 +108,9 @@ Follow conventional commit format:
 
 ### Pull Request Checklist
 
-- [ ] Tests pass locally (`npm test`)
-- [ ] Code builds successfully (`npm run build`)
-- [ ] Linting passes (`npm run lint`)
+- [ ] Tests pass locally (`pnpm test`)
+- [ ] Code builds successfully (`pnpm run build`)
+- [ ] Linting passes (`pnpm run lint`)
 - [ ] Documentation updated if needed
 - [ ] New functionality includes tests
 - [ ] Breaking changes are documented

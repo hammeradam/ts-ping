@@ -5,6 +5,7 @@
   "description": "A modern TypeScript library for performing ICMP ping operations with type-safe results and fluent configuration.",
   "author": "Hammer Ádám",
   "license": "MIT",
+  "packageManager": "pnpm@9.6.0",
   "keywords": [
     "ping",
     "icmp",
@@ -28,7 +29,8 @@
     "url": "https://github.com/hammeradam/ts-ping/issues"
   },
   "engines": {
-    "node": ">=18.0.0"
+    "node": ">=18.0.0",
+    "pnpm": ">=8.0.0"
   },
   "main": "dist/index.cjs",
   "module": "dist/index.js",
@@ -54,10 +56,10 @@
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
     "typecheck": "tsc --noEmit",
-    "prepublishOnly": "npm run build && npm run test && npm run lint",
-    "release:patch": "npm version patch && npm publish",
-    "release:minor": "npm version minor && npm publish",
-    "release:major": "npm version major && npm publish"
+    "prepublishOnly": "pnpm run build && pnpm run test && pnpm run lint",
+    "release:patch": "pnpm version patch && pnpm publish",
+    "release:minor": "pnpm version minor && pnpm publish",
+    "release:major": "pnpm version major && pnpm publish"
   },
   "publishConfig": {
     "access": "public"

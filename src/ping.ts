@@ -64,6 +64,143 @@ export class Ping {
     })
   }
 
+  /**
+   * Creates an async generator that yields ping results in real-time.
+   * Useful for continuous monitoring and streaming ping data.
+   *
+   * @example
+   * ```typescript
+   * const ping = new Ping('google.com').setInterval(1).setCount(0) // infinite
+   *
+   * for await (const result of ping.stream()) {
+   *   if (result.isSuccess()) {
+   *     console.log(`${new Date().toISOString()}: ${result.averageTimeInMs()}ms`)
+   *   } else {
+   *     console.error(`Ping failed: ${result.error}`)
+   *   }
+   * }
+   * ```
+   */
+  async* stream(): AsyncGenerator<PingResult, void, unknown> {
+    let sequenceNumber = 0
+    const isInfinite = this.count === 0 || this.count === Infinity
+
+    while (true) {
+      try {
+        const result = await this.runSinglePing(sequenceNumber++)
+        yield result
+
+        // Stop if we've reached the count limit (unless infinite)
+        if (!isInfinite && sequenceNumber >= this.count) {
+          break
+        }
+
+        // Wait for the interval before next ping
+        if (this.intervalInSeconds > 0) {
+          await this.sleep(this.intervalInSeconds * 1000)
+        }
+      }
+      catch (error) {
+        // Yield error result instead of throwing
+        yield PingResult.fromError(error as Error, this.hostname, {
+          timeout: this.timeoutInSeconds,
+          interval: this.intervalInSeconds,
+          packetSize: this.packetSizeInBytes,
+          ttl: this.ttl,
+        })
+      }
+    }
+  }
+
+  /**
+   * Creates an async generator that yields ping results with filtering and transformation.
+   *
+   * @param filter Optional filter function to include only specific results
+   * @param transform Optional transformation function to modify yielded values
+   *
+   * @example
+   * ```typescript
+   * // Only yield successful pings with latency values
+   * for await (const latency of ping.streamWithFilter(
+   *   r => r.isSuccess(),
+   *   r => r.averageTimeInMs()
+   * )) {
+   *   console.log(`Latency: ${latency}ms`)
+   * }
+   * ```
+   */
+  async* streamWithFilter<T = PingResult>(
+    filter?: (result: PingResult) => boolean,
+    transform?: (result: PingResult) => T,
+  ): AsyncGenerator<T, void, unknown> {
+    for await (const result of this.stream()) {
+      if (!filter || filter(result)) {
+        yield transform ? transform(result) : (result as unknown as T)
+      }
+    }
+  }
+
+  /**
+   * Creates an async generator that yields batches of ping results.
+   * Useful for processing results in chunks or implementing backpressure.
+   *
+   * @param bufferSize Number of results to collect before yielding a batch
+   *
+   * @example
+   * ```typescript
+   * for await (const batch of ping.streamBatched(5)) {
+   *   console.log(`Processing batch of ${batch.length} results`)
+   *   const avgLatency = batch
+   *     .filter(r => r.isSuccess())
+   *     .reduce((sum, r) => sum + r.averageTimeInMs(), 0) / batch.length
+   *   console.log(`Average latency: ${avgLatency}ms`)
+   * }
+   * ```
+   */
+  async* streamBatched(bufferSize: number = 10): AsyncGenerator<PingResult[], void, unknown> {
+    const buffer: PingResult[] = []
+
+    for await (const result of this.stream()) {
+      buffer.push(result)
+
+      if (buffer.length >= bufferSize) {
+        yield [...buffer]
+        buffer.length = 0
+      }
+    }
+
+    // Yield remaining results if any
+    if (buffer.length > 0) {
+      yield buffer
+    }
+  }
+
+  /**
+   * Runs a single ping operation with sequence number.
+   * Used internally by the streaming methods.
+   */
+  private async runSinglePing(_sequenceNumber: number): Promise<PingResult> {
+    // Create a temporary ping instance for single ping
+    const singlePing = new Ping(
+      this.hostname,
+      this.timeoutInSeconds,
+      1, // Always ping once
+      this.intervalInSeconds,
+      this.packetSizeInBytes,
+      this.ttl,
+      this.showLostPackets,
+    )
+
+    return await singlePing.runAsync()
+  }
+
+  /**
+   * Sleep utility for interval timing.
+   */
+  private sleep(ms: number): Promise<void> {
+    return new Promise(resolve => setTimeout(resolve, ms))
+  }
+
   executePingCommand(commandArray: string[]): SpawnSyncReturns<string> {
     const timeout = this.calculateProcessTimeout() * 1000
     const command = commandArray[0]

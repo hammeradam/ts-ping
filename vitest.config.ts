@@ -16,6 +16,7 @@ export default defineConfig({
         'eslint.config.js',
         'src/example.ts',
         'src/index.ts',
+        'src/streaming-examples.ts',
       ],
     },
   },

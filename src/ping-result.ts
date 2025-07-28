@@ -254,6 +254,61 @@ export class PingResult {
     })
   }
 
+  /**
+   * Creates a failed PingResult from an error.
+   * Used when ping operations throw exceptions.
+   */
+  static fromError(
+    error: Error,
+    host: string,
+    options: {
+      timeout: number
+      interval: number
+      packetSize: number
+      ttl: number
+    },
+  ): PingResult {
+    const errorType = PingResult.determineErrorFromMessage(error.message)
+
+    return new PingResult({
+      success: false,
+      error: errorType,
+      host,
+      packetLossPercentage: 100,
+      numberOfPacketsTransmitted: null,
+      numberOfPacketsReceived: null,
+      timeoutInSeconds: options.timeout,
+      intervalInSeconds: options.interval,
+      packetSizeInBytes: options.packetSize,
+      ttl: options.ttl,
+      minimumTimeInMs: null,
+      maximumTimeInMs: null,
+      averageTimeInMs: null,
+      standardDeviationTimeInMs: null,
+      rawOutput: `Error: ${error.message}`,
+      lines: [],
+    })
+  }
+
+  static determineErrorFromMessage(message: string): PingErrorType {
+    const lower = message.toLowerCase()
+
+    if (lower.includes('timeout') || lower.includes('timed out')) {
+      return PingError.Timeout
+    }
+    if (lower.includes('unknown host') || lower.includes('name or service not known')) {
+      return PingError.HostnameNotFound
+    }
+    if (lower.includes('no route to host') || lower.includes('host unreachable')) {
+      return PingError.HostUnreachable
+    }
+    if (lower.includes('permission denied')) {
+      return PingError.PermissionDenied
+    }
+
+    return PingError.UnknownError
+  }
+
   static determineErrorFromOutput(output: string): PingErrorType {
     const lower = output.toLowerCase()
 

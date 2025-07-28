@@ -12,7 +12,7 @@ export default antfu(
     },
   },
   {
-    files: ['src/example.ts'],
+    files: ['src/example.ts', 'src/streaming-examples.ts'],
     rules: {
       // Allow console in example files
       'no-console': 'off',

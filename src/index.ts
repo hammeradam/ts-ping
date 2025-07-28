@@ -14,5 +14,12 @@ export {
   PingErrorUtils,
 } from './ping-result.js'
 
+// Streaming utilities
+export {
+  combineAsyncIterators,
+  type PingStats,
+  PingStream,
+} from './ping-stream.js'
+
 // Main library exports
 export { Ping } from './ping.js'

@@ -281,7 +281,7 @@ export class PingResult {
   }
 
   static isPingResponseLine(line: string): boolean {
-    return /time([<=]+)[0-9.]+\s*ms/i.test(line)
+    return /time[<=]+[0-9.]+\s*ms/i.test(line)
   }
 
   static calculatePacketLossPercentage(transmitted: number, received: number): number {

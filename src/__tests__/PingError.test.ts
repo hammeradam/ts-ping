@@ -1,7 +1,7 @@
-import { describe, it, expect } from 'vitest'
-import { PingError, PingErrorUtils, type PingErrorType } from '../ping-result'
+import { describe, expect, it } from 'vitest'
+import { PingError, PingErrorUtils } from '../ping-result'
 
-describe('PingError', () => {
+describe('pingError', () => {
   it('should have all expected error constants', () => {
     expect(PingError.HostnameNotFound).toBe('HostnameNotFound')
     expect(PingError.HostUnreachable).toBe('HostUnreachable')
@@ -11,7 +11,7 @@ describe('PingError', () => {
   })
 })
 
-describe('PingErrorUtils', () => {
+describe('pingErrorUtils', () => {
   describe('from', () => {
     it('should return the same error if it is a valid PingErrorType', () => {
       expect(PingErrorUtils.from('HostnameNotFound')).toBe(PingError.HostnameNotFound)

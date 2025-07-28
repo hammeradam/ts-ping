@@ -68,7 +68,8 @@ const asyncResult = await new Ping('google.com').runAsync()
 try {
   const result = await new Ping('example.com').runAsync()
   console.log('Ping completed:', result.isSuccess())
-} catch (error) {
+}
+catch (error) {
   console.error('Ping failed with error:', error)
 }
 ```
@@ -105,11 +106,11 @@ new Ping(
 All methods return `this` for method chaining:
 
 ```typescript
-ping.setTimeout(10)           // Set timeout in seconds
-ping.setCount(5)              // Set number of pings
-ping.setInterval(2.0)         // Set interval between pings
-ping.setPacketSize(128)       // Set packet size in bytes
-ping.setTtl(32)              // Set Time To Live
+ping.setTimeout(10) // Set timeout in seconds
+ping.setCount(5) // Set number of pings
+ping.setInterval(2.0) // Set interval between pings
+ping.setPacketSize(128) // Set packet size in bytes
+ping.setTtl(32) // Set Time To Live
 ping.setShowLostPackets(false) // Enable/disable lost packet reporting
 ```
 
@@ -145,7 +146,8 @@ try {
   if (result.isSuccess()) {
     console.log('Ping successful!')
   }
-} catch (error) {
+}
+catch (error) {
   console.error('Ping failed:', error)
 }
 ```
@@ -165,13 +167,13 @@ The result object uses discriminated unions for type safety. Use type guards to 
 ```typescript
 if (result.isSuccess()) {
   // TypeScript knows these properties are available and non-null
-  console.log(result.host)                        // string
-  console.log(result.numberOfPacketsTransmitted)  // number
-  console.log(result.numberOfPacketsReceived)     // number
-  console.log(result.packetLossPercentage)        // number
-  console.log(result.averageTimeInMs)             // number | null
-  console.log(result.minimumTimeInMs)             // number | null
-  console.log(result.maximumTimeInMs)             // number | null
+  console.log(result.host) // string
+  console.log(result.numberOfPacketsTransmitted) // number
+  console.log(result.numberOfPacketsReceived) // number
+  console.log(result.packetLossPercentage) // number
+  console.log(result.averageTimeInMs) // number | null
+  console.log(result.minimumTimeInMs) // number | null
+  console.log(result.maximumTimeInMs) // number | null
 }
 ```
 
@@ -180,9 +182,9 @@ if (result.isSuccess()) {
 ```typescript
 if (result.isFailure()) {
   // TypeScript knows the error property is available
-  console.log(result.error)                       // PingErrorType
-  console.log(result.host)                        // string | null
-  console.log(result.packetLossPercentage)        // 100
+  console.log(result.error) // PingErrorType
+  console.log(result.host) // string | null
+  console.log(result.packetLossPercentage) // 100
 }
 ```
 
@@ -191,23 +193,23 @@ if (result.isFailure()) {
 Available on both success and failure results:
 
 ```typescript
-result.rawOutput              // string - full ping command output
-result.lines                  // PingResultLine[] - parsed ping response lines
-result.timeoutInSeconds       // number | null
-result.intervalInSeconds      // number
-result.packetSizeInBytes      // number
-result.ttl                    // number
+result.rawOutput // string - full ping command output
+result.lines // PingResultLine[] - parsed ping response lines
+result.timeoutInSeconds // number | null
+result.intervalInSeconds // number
+result.packetSizeInBytes // number
+result.ttl // number
 ```
 
 ### Error Types
 
 ```typescript
-type PingErrorType = 
-  | 'HostnameNotFound'
-  | 'HostUnreachable' 
-  | 'PermissionDenied'
-  | 'Timeout'
-  | 'UnknownError'
+type PingErrorType
+  = | 'HostnameNotFound'
+    | 'HostUnreachable'
+    | 'PermissionDenied'
+    | 'Timeout'
+    | 'UnknownError'
 ```
 
 ### PingResultLine
@@ -215,9 +217,9 @@ type PingErrorType =
 Individual ping response lines with parsed timing information:
 
 ```typescript
-line.getRawLine()    // string - original ping output line
-line.getTimeInMs()   // number - parsed response time in milliseconds
-line.toArray()       // { line: string, time_in_ms: number }
+line.getRawLine() // string - original ping output line
+line.getTimeInMs() // number - parsed response time in milliseconds
+line.toArray() // { line: string, time_in_ms: number }
 ```
 
 ## Examples
@@ -231,7 +233,8 @@ const result = new Ping('google.com').run()
 
 if (result.isSuccess()) {
   console.log('Ping successful!')
-} else {
+}
+else {
   console.log('Ping failed:', result.error)
 }
 ```
@@ -244,14 +247,16 @@ import { Ping } from 'ts-ping'
 async function pingExample() {
   try {
     const result = await new Ping('google.com').runAsync()
-    
+
     if (result.isSuccess()) {
       console.log('Async ping successful!')
       console.log(`Average time: ${result.averageResponseTimeInMs()}ms`)
-    } else {
+    }
+    else {
       console.log('Async ping failed:', result.error)
     }
-  } catch (error) {
+  }
+  catch (error) {
     console.error('Ping threw an error:', error)
   }
 }
@@ -266,23 +271,25 @@ import { Ping } from 'ts-ping'
 
 async function pingMultipleHosts() {
   const hosts = ['google.com', 'github.com', 'stackoverflow.com']
-  
-  const promises = hosts.map(host => 
+
+  const promises = hosts.map(host =>
     new Ping(host).setTimeout(5).runAsync()
   )
-  
+
   try {
     const results = await Promise.all(promises)
-    
+
     results.forEach((result, index) => {
       const host = hosts[index]
       if (result.isSuccess()) {
         console.log(`${host}: ${result.averageResponseTimeInMs()}ms`)
-      } else {
+      }
+      else {
         console.log(`${host}: ${result.error}`)
       }
     })
-  } catch (error) {
+  }
+  catch (error) {
     console.error('One or more pings failed:', error)
   }
 }
@@ -296,11 +303,11 @@ pingMultipleHosts()
 import { Ping } from 'ts-ping'
 
 const ping = new Ping('example.com')
-  .setTimeout(10)           // 10 second timeout
-  .setCount(5)              // Send 5 pings
-  .setInterval(2.0)         // 2 second interval
-  .setPacketSize(128)       // 128 byte packets
-  .setTtl(32)              // TTL of 32
+  .setTimeout(10) // 10 second timeout
+  .setCount(5) // Send 5 pings
+  .setInterval(2.0) // 2 second interval
+  .setPacketSize(128) // 128 byte packets
+  .setTtl(32) // TTL of 32
   .setShowLostPackets(true) // Show lost packets (Linux only)
 
 const result = ping.run()
@@ -310,15 +317,16 @@ if (result.isSuccess()) {
   console.log(`Packets sent: ${result.numberOfPacketsTransmitted}`)
   console.log(`Packets received: ${result.numberOfPacketsReceived}`)
   console.log(`Packet loss: ${result.packetLossPercentage}%`)
-  
+
   if (result.averageTimeInMs) {
     console.log(`Average time: ${result.averageTimeInMs}ms`)
   }
-  
+
   if (result.minimumTimeInMs && result.maximumTimeInMs) {
     console.log(`Time range: ${result.minimumTimeInMs}ms - ${result.maximumTimeInMs}ms`)
   }
-} else {
+}
+else {
   console.error(`Ping failed with error: ${result.error}`)
 }
 ```
@@ -382,17 +390,18 @@ The library automatically detects the platform and adjusts command parameters ac
 This library is built with TypeScript and provides excellent type safety:
 
 ```typescript
-import { Ping, PingResult, SuccessfulPingResult, FailedPingResult } from 'ts-ping'
+import { FailedPingResult, Ping, PingResult, SuccessfulPingResult } from 'ts-ping'
 
 function handlePingResult(result: PingResult) {
   if (result.isSuccess()) {
     // result is automatically narrowed to SuccessfulPingResult
-    const host: string = result.host                    // ✅ string
+    const host: string = result.host // ✅ string
     const transmitted: number = result.numberOfPacketsTransmitted // ✅ number
-  } else {
-    // result is automatically narrowed to FailedPingResult  
-    const error: PingErrorType = result.error           // ✅ PingErrorType
-    const loss: 100 = result.packetLossPercentage      // ✅ exactly 100
+  }
+  else {
+    // result is automatically narrowed to FailedPingResult
+    const error: PingErrorType = result.error // ✅ PingErrorType
+    const loss: 100 = result.packetLossPercentage // ✅ exactly 100
   }
 }
 ```
@@ -422,7 +431,7 @@ pnpm run lint:fix        # Fix linting issues automatically
 
 ## Requirements
 
-- Node.js 18+ 
+- Node.js 18+
 - pnpm 8+ (recommended) or npm/yarn
 - TypeScript 5+
 - macOS or Linux (ping command must be available)

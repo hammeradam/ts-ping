@@ -1,5 +1,5 @@
-import { describe, it, expect, vi } from 'vitest'
-import { PingResult, PingError, PingResultLine } from '../ping-result'
+import { describe, expect, it } from 'vitest'
+import { PingError, PingResult } from '../ping-result'
 
 interface PingResultOptions {
   output: string[]
@@ -11,7 +11,7 @@ interface PingResultOptions {
   ttl: number
 }
 
-describe('PingResult', () => {
+describe('pingResult', () => {
   describe('fromPingOutput', () => {
     it('should create a failed result when returnCode is non-zero', () => {
       const options: PingResultOptions = {
@@ -21,7 +21,7 @@ describe('PingResult', () => {
         timeout: 5,
         interval: 1,
         packetSize: 56,
-        ttl: 64
+        ttl: 64,
       }
 
       const result = PingResult.fromPingOutput(options)
@@ -45,14 +45,14 @@ describe('PingResult', () => {
           '',
           '--- google.com ping statistics ---',
           '2 packets transmitted, 2 received, 0% packet loss',
-          'round-trip min/avg/max/stddev = 10.5/11.4/12.3/0.9 ms'
+          'round-trip min/avg/max/stddev = 10.5/11.4/12.3/0.9 ms',
         ],
         returnCode: 0,
         host: 'google.com',
         timeout: 5,
         interval: 1,
         packetSize: 56,
-        ttl: 64
+        ttl: 64,
       }
 
       const result = PingResult.fromPingOutput(options)
@@ -78,14 +78,14 @@ describe('PingResult', () => {
           '64 bytes from 142.250.185.110: icmp_seq=0 ttl=115 time=10.5 ms',
           '',
           '--- google.com ping statistics ---',
-          '3 packets transmitted, 1 received, 66% packet loss'
+          '3 packets transmitted, 1 received, 66% packet loss',
         ],
         returnCode: 0,
         host: 'google.com',
         timeout: 5,
         interval: 1,
         packetSize: 56,
-        ttl: 64
+        ttl: 64,
       }
 
       const result = PingResult.fromPingOutput(options)
@@ -103,14 +103,14 @@ describe('PingResult', () => {
           'PING google.com (142.250.185.110): 56 data bytes',
           '',
           '--- google.com ping statistics ---',
-          '3 packets transmitted, 0 received, 100% packet loss'
+          '3 packets transmitted, 0 received, 100% packet loss',
         ],
         returnCode: 0,
         host: 'google.com',
         timeout: 5,
         interval: 1,
         packetSize: 56,
-        ttl: 64
+        ttl: 64,
       }
 
       const result = PingResult.fromPingOutput(options)
@@ -123,48 +123,59 @@ describe('PingResult', () => {
 
   describe('determineErrorFromOutput', () => {
     it('should detect hostname not found errors', () => {
-      expect(PingResult.determineErrorFromOutput('ping: unknown host example.com'))
-        .toBe(PingError.HostnameNotFound)
-      
-      expect(PingResult.determineErrorFromOutput('ping: name or service not known'))
-        .toBe(PingError.HostnameNotFound)
+      expect(
+        PingResult.determineErrorFromOutput('ping: unknown host example.com'),
+      ).toBe(PingError.HostnameNotFound)
+
+      expect(
+        PingResult.determineErrorFromOutput('ping: name or service not known'),
+      ).toBe(PingError.HostnameNotFound)
     })
 
     it('should detect host unreachable errors', () => {
-      expect(PingResult.determineErrorFromOutput('ping: no route to host'))
-        .toBe(PingError.HostUnreachable)
-      
-      expect(PingResult.determineErrorFromOutput('ping: host unreachable'))
-        .toBe(PingError.HostUnreachable)
+      expect(
+        PingResult.determineErrorFromOutput('ping: no route to host'),
+      ).toBe(PingError.HostUnreachable)
+
+      expect(
+        PingResult.determineErrorFromOutput('ping: host unreachable'),
+      ).toBe(PingError.HostUnreachable)
     })
 
     it('should detect permission denied errors', () => {
-      expect(PingResult.determineErrorFromOutput('ping: permission denied'))
-        .toBe(PingError.PermissionDenied)
+      expect(
+        PingResult.determineErrorFromOutput('ping: permission denied'),
+      ).toBe(PingError.PermissionDenied)
     })
 
     it('should detect timeout errors', () => {
-      expect(PingResult.determineErrorFromOutput('ping: timeout'))
-        .toBe(PingError.Timeout)
-      
-      expect(PingResult.determineErrorFromOutput('ping: timed out'))
-        .toBe(PingError.Timeout)
+      expect(PingResult.determineErrorFromOutput('ping: timeout')).toBe(
+        PingError.Timeout,
+      )
+
+      expect(PingResult.determineErrorFromOutput('ping: timed out')).toBe(
+        PingError.Timeout,
+      )
     })
 
     it('should return unknown error for unrecognized output', () => {
-      expect(PingResult.determineErrorFromOutput('some other error'))
-        .toBe(PingError.UnknownError)
-      
-      expect(PingResult.determineErrorFromOutput(''))
-        .toBe(PingError.UnknownError)
+      expect(PingResult.determineErrorFromOutput('some other error')).toBe(
+        PingError.UnknownError,
+      )
+
+      expect(PingResult.determineErrorFromOutput('')).toBe(
+        PingError.UnknownError,
+      )
     })
 
     it('should be case insensitive', () => {
-      expect(PingResult.determineErrorFromOutput('PING: UNKNOWN HOST example.com'))
-        .toBe(PingError.HostnameNotFound)
-      
-      expect(PingResult.determineErrorFromOutput('PING: TIMEOUT'))
-        .toBe(PingError.Timeout)
+      expect(
+        PingResult.determineErrorFromOutput('PING: UNKNOWN HOST example.com'),
+      ).toBe(PingError.HostnameNotFound)
+
+      expect(PingResult.determineErrorFromOutput('PING: TIMEOUT')).toBe(
+        PingError.Timeout,
+      )
     })
   })
 
@@ -176,7 +187,7 @@ describe('PingResult', () => {
         '64 bytes from 142.250.185.110: icmp_seq=1 ttl=115 time=12.3 ms',
         '',
         '--- google.com ping statistics ---',
-        '2 packets transmitted, 2 received, 0% packet loss'
+        '2 packets transmitted, 2 received, 0% packet loss',
       ]
 
       const lines = PingResult.parsePingLines(output)
@@ -192,7 +203,7 @@ describe('PingResult', () => {
         '64 bytes from 142.250.185.110: icmp_seq=0 ttl=115 time=10.5 ms',
         'some other line without time',
         '',
-        '--- google.com ping statistics ---'
+        '--- google.com ping statistics ---',
       ]
 
       const lines = PingResult.parsePingLines(output)
@@ -204,22 +215,31 @@ describe('PingResult', () => {
 
   describe('isPingResponseLine', () => {
     it('should return true for valid ping response lines', () => {
-      expect(PingResult.isPingResponseLine('64 bytes from 142.250.185.110: icmp_seq=0 ttl=115 time=10.5 ms'))
-        .toBe(true)
-      
-      expect(PingResult.isPingResponseLine('64 bytes from 142.250.185.110: icmp_seq=0 ttl=115 time<=0.1 ms'))
-        .toBe(true)
+      expect(
+        PingResult.isPingResponseLine(
+          '64 bytes from 142.250.185.110: icmp_seq=0 ttl=115 time=10.5 ms',
+        ),
+      ).toBe(true)
+
+      expect(
+        PingResult.isPingResponseLine(
+          '64 bytes from 142.250.185.110: icmp_seq=0 ttl=115 time<=0.1 ms',
+        ),
+      ).toBe(true)
     })
 
     it('should return false for non-ping response lines', () => {
-      expect(PingResult.isPingResponseLine('PING google.com (142.250.185.110): 56 data bytes'))
-        .toBe(false)
-      
-      expect(PingResult.isPingResponseLine('--- google.com ping statistics ---'))
-        .toBe(false)
-      
-      expect(PingResult.isPingResponseLine(''))
-        .toBe(false)
+      expect(
+        PingResult.isPingResponseLine(
+          'PING google.com (142.250.185.110): 56 data bytes',
+        ),
+      ).toBe(false)
+
+      expect(
+        PingResult.isPingResponseLine('--- google.com ping statistics ---'),
+      ).toBe(false)
+
+      expect(PingResult.isPingResponseLine('')).toBe(false)
     })
   })
 
@@ -240,15 +260,13 @@ describe('PingResult', () => {
   describe('averageResponseTimeInMs', () => {
     it('should return parsed average time when available', () => {
       const options: PingResultOptions = {
-        output: [
-          'round-trip min/avg/max/stddev = 10.5/11.4/12.3/0.9 ms'
-        ],
+        output: ['round-trip min/avg/max/stddev = 10.5/11.4/12.3/0.9 ms'],
         returnCode: 0,
         host: 'google.com',
         timeout: 5,
         interval: 1,
         packetSize: 56,
-        ttl: 64
+        ttl: 64,
       }
 
       const result = PingResult.fromPingOutput(options)
@@ -259,14 +277,14 @@ describe('PingResult', () => {
       const options: PingResultOptions = {
         output: [
           '64 bytes from 142.250.185.110: icmp_seq=0 ttl=115 time=10.0 ms',
-          '64 bytes from 142.250.185.110: icmp_seq=1 ttl=115 time=20.0 ms'
+          '64 bytes from 142.250.185.110: icmp_seq=1 ttl=115 time=20.0 ms',
         ],
         returnCode: 0,
         host: 'google.com',
         timeout: 5,
         interval: 1,
         packetSize: 56,
-        ttl: 64
+        ttl: 64,
       }
 
       const result = PingResult.fromPingOutput(options)
@@ -281,7 +299,7 @@ describe('PingResult', () => {
         timeout: 5,
         interval: 1,
         packetSize: 56,
-        ttl: 64
+        ttl: 64,
       }
 
       const result = PingResult.fromPingOutput(options)
@@ -295,14 +313,14 @@ describe('PingResult', () => {
         output: [
           '64 bytes from 142.250.185.110: icmp_seq=0 ttl=115 time=10.5 ms',
           '2 packets transmitted, 2 received, 0% packet loss',
-          'round-trip min/avg/max/stddev = 10.5/11.4/12.3/0.9 ms'
+          'round-trip min/avg/max/stddev = 10.5/11.4/12.3/0.9 ms',
         ],
         returnCode: 0,
         host: 'google.com',
         timeout: 5,
         interval: 1,
         packetSize: 56,
-        ttl: 64
+        ttl: 64,
       }
 
       const result = PingResult.fromPingOutput(options)
@@ -336,7 +354,7 @@ describe('PingResult', () => {
         timeout: 5,
         interval: 1,
         packetSize: 56,
-        ttl: 64
+        ttl: 64,
       }
 
       const result = PingResult.fromPingOutput(options)
@@ -349,14 +367,14 @@ describe('PingResult', () => {
       const options: PingResultOptions = {
         output: [
           '64 bytes from 142.250.185.110: icmp_seq=0 ttl=115 time=10.5 ms',
-          '1 packets transmitted, 1 received, 0% packet loss'
+          '1 packets transmitted, 1 received, 0% packet loss',
         ],
         returnCode: 0,
         host: 'google.com',
         timeout: 5,
         interval: 1,
         packetSize: 56,
-        ttl: 64
+        ttl: 64,
       }
 
       const result = PingResult.fromPingOutput(options)
@@ -379,7 +397,7 @@ describe('PingResult', () => {
         timeout: 5,
         interval: 1,
         packetSize: 56,
-        ttl: 64
+        ttl: 64,
       }
 
       const result = PingResult.fromPingOutput(options)

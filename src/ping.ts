@@ -1,5 +1,5 @@
 import type { SpawnSyncReturns } from 'node:child_process'
-import { spawnSync, spawn } from 'node:child_process'
+import { spawn, spawnSync } from 'node:child_process'
 import os from 'node:os'
 import { PingResult } from './ping-result.ts'
 
@@ -87,7 +87,7 @@ export class Ping {
 
       let stdout = ''
       let stderr = ''
-      
+
       const child = spawn(command, commandArray.slice(1))
 
       const timeoutId = setTimeout(() => {
@@ -95,17 +95,17 @@ export class Ping {
         reject(new Error(`Ping command timed out after ${timeout}ms`))
       }, timeout)
 
-      child.stdout.on('data', (data: Buffer) => {
+      child.stdout.on('data', (data) => {
         stdout += data.toString('utf-8')
       })
 
-      child.stderr.on('data', (data: Buffer) => {
+      child.stderr.on('data', (data) => {
         stderr += data.toString('utf-8')
       })
 
-      child.on('close', (code: number | null, signal: NodeJS.Signals | null) => {
+      child.on('close', (code, signal) => {
         clearTimeout(timeoutId)
-        
+
         // Create a SpawnSyncReturns-like object
         const result: SpawnSyncReturns<string> = {
           pid: child.pid || 0,
@@ -114,7 +114,7 @@ export class Ping {
           stderr,
           status: code,
           signal,
-          error: undefined
+          error: undefined,
         }
 
         resolve(result)

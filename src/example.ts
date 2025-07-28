@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 import { Ping } from './ping.js'
 
 // Example usage of the Ping library
@@ -23,7 +22,7 @@ else if (result.isFailure()) {
 // Asynchronous example
 async function asyncExample() {
   console.log('\n=== Asynchronous Ping ===')
-  
+
   try {
     const asyncPing = new Ping('google.com').setCount(2).setTimeout(5)
     const asyncResult = await asyncPing.runAsync()
@@ -31,10 +30,12 @@ async function asyncExample() {
     if (asyncResult.isSuccess()) {
       console.log(`Async ping successful to ${asyncResult.host}`)
       console.log(`Average time: ${asyncResult.averageResponseTimeInMs()}ms`)
-    } else {
+    }
+    else {
       console.error(`Async ping failed: ${asyncResult.error}`)
     }
-  } catch (error) {
+  }
+  catch (error) {
     console.error('Async ping threw an error:', error)
   }
 }

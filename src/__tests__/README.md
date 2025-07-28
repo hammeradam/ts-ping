@@ -14,7 +14,7 @@ Comprehensive test suite for the TypeScript ping library using Vitest.
 - Tests PingResultLine constructor with default and custom values
 - Tests time parsing from ping response lines with different formats:
   - `time=10.5 ms`
-  - `time<=0.1 ms` 
+  - `time<=0.1 ms`
   - Different decimal places
   - Case insensitive patterns
 - Tests array and string representation methods
@@ -52,7 +52,7 @@ Comprehensive test suite for the TypeScript ping library using Vitest.
 
 ## Coverage Results
 - **Statement Coverage:** 94.22%
-- **Branch Coverage:** 97.84% 
+- **Branch Coverage:** 97.84%
 - **Function Coverage:** 97.82%
 - **Line Coverage:** 94.22%
 
@@ -66,7 +66,7 @@ Comprehensive test suite for the TypeScript ping library using Vitest.
 - **Environment:** Node.js
 - **Mocking:** vi.mock() for child_process and os modules
 - **Coverage Provider:** V8
-- **Test Scripts:** 
+- **Test Scripts:**
   - `npm test` - run all tests
   - `npm run test:watch` - run tests in watch mode
 

@@ -48,7 +48,7 @@ Add any other context, screenshots, or examples about the feature request here.
 How important is this feature to you?
 
 - [ ] Critical - blocking my project
-- [ ] High - would significantly improve my workflow  
+- [ ] High - would significantly improve my workflow
 - [ ] Medium - nice to have
 - [ ] Low - minor improvement
 

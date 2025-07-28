@@ -12,8 +12,8 @@ export default defineConfig({
         'dist/',
         'build/',
         '**/*.test.ts',
-        '**/*.config.ts'
-      ]
-    }
-  }
+        '**/*.config.ts',
+      ],
+    },
+  },
 })

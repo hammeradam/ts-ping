@@ -2,10 +2,18 @@
   "name": "ts-ping",
   "type": "module",
   "version": "1.0.0",
+  "packageManager": "pnpm@9.6.0",
   "description": "A modern TypeScript library for performing ICMP ping operations with type-safe results and fluent configuration.",
   "author": "Hammer Ádám",
   "license": "MIT",
-  "packageManager": "pnpm@9.6.0",
+  "homepage": "https://github.com/hammeradam/ts-ping#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hammeradam/ts-ping.git"
+  },
+  "bugs": {
+    "url": "https://github.com/hammeradam/ts-ping/issues"
+  },
   "keywords": [
     "ping",
     "icmp",
@@ -20,21 +28,6 @@
     "type-safe",
     "cross-platform"
   ],
-  "homepage": "https://github.com/hammeradam/ts-ping#readme",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/hammeradam/ts-ping.git"
-  },
-  "bugs": {
-    "url": "https://github.com/hammeradam/ts-ping/issues"
-  },
-  "engines": {
-    "node": ">=18.0.0",
-    "pnpm": ">=8.0.0"
-  },
-  "main": "dist/index.cjs",
-  "module": "dist/index.js",
-  "types": "dist/index.d.ts",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
@@ -42,11 +35,18 @@
       "require": "./dist/index.cjs"
     }
   },
+  "main": "dist/index.cjs",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
   "files": [
-    "dist",
+    "LICENSE",
     "README.md",
-    "LICENSE"
+    "dist"
   ],
+  "engines": {
+    "node": ">=18.0.0",
+    "pnpm": ">=8.0.0"
+  },
   "scripts": {
     "build": "tsup src/index.ts --format cjs,esm --dts",
     "dev": "tsx src/example.ts",

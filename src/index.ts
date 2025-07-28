@@ -1,18 +1,18 @@
-// Main library exports
-export { Ping } from './ping.js'
-
 // Result types and classes
 export {
+  type FailedPingResult,
   PingResult,
+  type PingResultArray,
   PingResultLine,
   type SuccessfulPingResult,
-  type FailedPingResult,
-  type PingResultArray,
 } from './ping-result.js'
 
 // Error types and utilities
 export {
   PingError,
-  PingErrorUtils,
   type PingErrorType,
+  PingErrorUtils,
 } from './ping-result.js'
+
+// Main library exports
+export { Ping } from './ping.js'

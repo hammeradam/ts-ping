@@ -1,6 +1,7 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
+import { Buffer } from 'node:buffer'
 import { spawnSync } from 'node:child_process'
 import os from 'node:os'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { Ping } from '../ping'
 
 // Mock the dependencies
@@ -10,7 +11,7 @@ vi.mock('node:os')
 const mockSpawnSync = vi.mocked(spawnSync)
 const mockOs = vi.mocked(os)
 
-describe('Ping', () => {
+describe('ping', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     // Default OS to non-macOS
@@ -122,10 +123,12 @@ describe('Ping', () => {
 
       expect(command).toEqual([
         'ping',
-        '-c', '1',
-        '-W', '5',
+        '-c',
+        '1',
+        '-W',
+        '5',
         '-O',
-        'google.com'
+        'google.com',
       ])
     })
 
@@ -135,10 +138,12 @@ describe('Ping', () => {
 
       expect(command).toEqual([
         'ping',
-        '-c', '3',
-        '-W', '10',
+        '-c',
+        '3',
+        '-W',
+        '10',
         '-O',
-        'google.com'
+        'google.com',
       ])
     })
 
@@ -233,7 +238,7 @@ describe('Ping', () => {
       const mockResult = {
         stdout: 'line1\nline2\n',
         stderr: 'error1\nerror2\n',
-        status: 0
+        status: 0,
       } as any
 
       const combined = ping.combineOutputLines(mockResult)
@@ -246,7 +251,7 @@ describe('Ping', () => {
       const mockResult = {
         stdout: '',
         stderr: 'error1\nerror2\n',
-        status: 0
+        status: 0,
       } as any
 
       const combined = ping.combineOutputLines(mockResult)
@@ -259,7 +264,7 @@ describe('Ping', () => {
       const mockResult = {
         stdout: 'line1\nline2\n',
         stderr: '',
-        status: 0
+        status: 0,
       } as any
 
       const combined = ping.combineOutputLines(mockResult)
@@ -272,7 +277,7 @@ describe('Ping', () => {
       const mockResult = {
         stdout: 'line1\n\nline2\n',
         stderr: 'error1\n\n',
-        status: 0
+        status: 0,
       } as any
 
       const combined = ping.combineOutputLines(mockResult)
@@ -285,7 +290,7 @@ describe('Ping', () => {
       const mockResult = {
         stdout: null,
         stderr: null,
-        status: 1
+        status: 1,
       } as any
 
       const combined = ping.combineOutputLines(mockResult)
@@ -301,7 +306,7 @@ describe('Ping', () => {
         '64 bytes from 142.250.185.110: icmp_seq=0 ttl=115 time=10.5 ms',
         '',
         '--- google.com ping statistics ---',
-        '1 packets transmitted, 1 received, 0% packet loss'
+        '1 packets transmitted, 1 received, 0% packet loss',
       ]
 
       mockSpawnSync.mockReturnValue({
@@ -311,7 +316,7 @@ describe('Ping', () => {
         signal: null,
         error: undefined,
         pid: 12345,
-        output: [null, Buffer.from(mockOutput.join('\n')), Buffer.from('')]
+        output: [null, Buffer.from(mockOutput.join('\n')), Buffer.from('')],
       })
 
       const ping = new Ping('google.com')
@@ -322,8 +327,8 @@ describe('Ping', () => {
         ['-c', '1', '-W', '5', '-O', 'google.com'],
         expect.objectContaining({
           encoding: 'utf-8',
-          timeout: expect.any(Number)
-        })
+          timeout: expect.any(Number),
+        }),
       )
 
       expect(result.isSuccess()).toBe(true)
@@ -338,7 +343,7 @@ describe('Ping', () => {
         signal: null,
         error: undefined,
         pid: 12345,
-        output: [null, Buffer.from(''), Buffer.from('ping: unknown host example.com')]
+        output: [null, Buffer.from(''), Buffer.from('ping: unknown host example.com')],
       })
 
       const ping = new Ping('example.com')
@@ -356,7 +361,7 @@ describe('Ping', () => {
         signal: 'SIGTERM',
         error: undefined,
         pid: 12345,
-        output: [null, Buffer.from(''), Buffer.from('command failed')]
+        output: [null, Buffer.from(''), Buffer.from('command failed')],
       })
 
       const ping = new Ping('example.com')
@@ -373,7 +378,7 @@ describe('Ping', () => {
         '64 bytes from 142.250.185.110: icmp_seq=0 ttl=115 time=10.5 ms',
         '',
         '--- google.com ping statistics ---',
-        '1 packets transmitted, 1 received, 0% packet loss'
+        '1 packets transmitted, 1 received, 0% packet loss',
       ]
 
       // Mock the executePingCommandAsync method
@@ -385,7 +390,7 @@ describe('Ping', () => {
         signal: null,
         error: undefined,
         pid: 12345,
-        output: [null, mockOutput.join('\n'), '']
+        output: [null, mockOutput.join('\n'), ''],
       }
 
       vi.spyOn(ping, 'executePingCommandAsync').mockResolvedValue(mockResult)
@@ -405,7 +410,7 @@ describe('Ping', () => {
         signal: null,
         error: undefined,
         pid: 12345,
-        output: [null, '', 'ping: unknown host example.com']
+        output: [null, '', 'ping: unknown host example.com'],
       }
 
       vi.spyOn(ping, 'executePingCommandAsync').mockResolvedValue(mockResult)
@@ -418,7 +423,7 @@ describe('Ping', () => {
 
     it('should handle async timeout rejection', async () => {
       const ping = new Ping('example.com')
-      
+
       vi.spyOn(ping, 'executePingCommandAsync').mockRejectedValue(new Error('Ping command timed out after 11000ms'))
 
       await expect(ping.runAsync()).rejects.toThrow('Ping command timed out after 11000ms')

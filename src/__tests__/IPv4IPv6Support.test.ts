@@ -57,6 +57,69 @@ describe('iPv4/IPv6 Support', () => {
     })
   })
 
+  describe('iPv6 Auto-detection', () => {
+    it('should auto-detect IPv6 addresses', () => {
+      const ping = new Ping('2001:4860:4860::8888')
+      expect(ping.ipVersion).toBe(6)
+    })
+
+    it('should not set IP version for IPv4 addresses', () => {
+      const ping = new Ping('8.8.8.8')
+      expect(ping.ipVersion).toBeUndefined()
+    })
+
+    it('should not set IP version for hostnames', () => {
+      const ping = new Ping('google.com')
+      expect(ping.ipVersion).toBeUndefined()
+    })
+
+    it('should allow explicit override of auto-detected IPv6', () => {
+      const ping = new Ping('2001:4860:4860::8888').setIPv4()
+      expect(ping.ipVersion).toBe(4)
+    })
+
+    it('should allow explicit override of auto-detected IPv6 to IPv6', () => {
+      const ping = new Ping('2001:4860:4860::8888').setIPv6()
+      expect(ping.ipVersion).toBe(6)
+    })
+
+    it('should auto-detect various IPv6 address formats', () => {
+      const testCases = [
+        '2001:4860:4860::8888',
+        '::1',
+        'fe80::1',
+        '2001:db8::1',
+        '::ffff:192.0.2.1', // IPv4-mapped IPv6
+      ]
+
+      testCases.forEach((ipv6) => {
+        const ping = new Ping(ipv6)
+        expect(ping.ipVersion).toBe(6)
+      })
+    })
+
+    it('should use ping6 command on macOS for auto-detected IPv6', () => {
+      mockOs.platform.mockReturnValue('darwin')
+
+      const ping = new Ping('2001:4860:4860::8888')
+      const command = ping.buildPingCommand()
+
+      expect(command[0]).toBe('ping6')
+      expect(ping.ipVersion).toBe(6)
+    })
+
+    it('should use ping -6 command on Linux for auto-detected IPv6', () => {
+      mockOs.platform.mockReturnValue('linux')
+
+      const ping = new Ping('2001:4860:4860::8888')
+      const command = ping.buildPingCommand()
+
+      expect(command[0]).toBe('ping')
+      expect(command).toContain('-6')
+      expect(ping.ipVersion).toBe(6)
+    })
+  })
+
   describe('macOS command Building', () => {
     beforeEach(() => {
       mockOs.platform.mockReturnValue('darwin')

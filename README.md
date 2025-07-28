@@ -13,7 +13,7 @@ A modern TypeScript library for performing ICMP ping operations with type-safe r
 - 🎯 **Type-Safe**: Built with TypeScript and discriminated union types for reliable type checking
 - 🔧 **Fluent Interface**: Chainable methods for easy configuration
 - 🌍 **Cross-Platform**: Works on Windows, macOS, and Linux with platform-specific optimizations
-- 🌐 **IPv4/IPv6 Support**: Full dual-stack support with platform-specific command handling
+- 🌐 **IPv4/IPv6 Support**: Full dual-stack support with automatic IPv6 detection and platform-specific command handling
 - 📊 **Comprehensive Results**: Detailed ping statistics including packet loss, timing, and error information
 - 🌊 **Streaming Support**: Real-time ping monitoring with async generators and advanced utilities
 - 📈 **Live Statistics**: Rolling statistics calculation with jitter, packet loss, and performance metrics
@@ -184,23 +184,30 @@ ping.setIPv6() // Force IPv6 (convenience method)
 
 #### IPv4/IPv6 Support
 
-Control which IP version to use for ping operations:
+Control which IP version to use for ping operations. ts-ping automatically detects IPv6 addresses and uses the appropriate ping command on all platforms.
 
 ```typescript
-// Force IPv4
-const ping4 = new Ping('google.com').setIPv4()
-const result4 = ping4.run()
+// Auto-detection: IPv6 addresses are automatically detected
+const ping6Auto = new Ping('2001:4860:4860::8888') // Auto-detects IPv6
+const result6Auto = ping6Auto.run() // Uses ping6 on macOS, ping -6 on Linux/Windows
 
-// Force IPv6
-const ping6 = new Ping('google.com').setIPv6()
-const result6 = ping6.run()
+// IPv4 addresses and hostnames use system default
+const ping4 = new Ping('8.8.8.8') // No auto-detection, uses system default
+const pingHost = new Ping('google.com') // Uses system default
+
+// Force IPv4 (overrides auto-detection)
+const ping4Force = new Ping('google.com').setIPv4()
+const result4 = ping4Force.run()
+
+// Force IPv6 (overrides auto-detection)
+const ping6Force = new Ping('google.com').setIPv6()
+const result6 = ping6Force.run()
 
 // Or use setIPVersion method
 const ping = new Ping('google.com').setIPVersion(6)
 
 // Works with all other options
-const result = new Ping('dual-stack.example.com')
-  .setIPv6()
+const result = new Ping('2001:4860:4860::8888') // Auto-detects IPv6
   .setCount(3)
   .setTimeout(5)
   .run()
@@ -210,6 +217,12 @@ if (result.isSuccess()) {
   console.log(`Host: ${result.host}`)
 }
 ```
+
+**Auto-Detection Behavior:**
+- **IPv6 addresses**: Automatically detected and use appropriate IPv6 ping command
+- **IPv4 addresses**: Use system default ping command (no version forcing)
+- **Hostnames**: Use system default ping command (no version forcing)
+- **Explicit methods**: `setIPv4()` and `setIPv6()` override auto-detection
 
 **Platform Support:**
 - **macOS**: Uses `ping` for IPv4 and `ping6` for IPv6
@@ -961,6 +974,16 @@ MIT License - see LICENSE file for details.
 Contributions are welcome! Please read the contributing guidelines and ensure all tests pass before submitting a pull request.
 
 ## Changelog
+
+### v1.4.0 (2025-07-28)
+- 🔍 **IPv6 Auto-Detection**: Automatically detects IPv6 addresses and uses appropriate ping commands on all platforms
+- 🍎 **macOS IPv6 Fix**: Resolves IPv6 ping failures on macOS by auto-selecting `ping6` command for IPv6 addresses
+- 🧠 **Smart IP Detection**: Uses Node.js `isIPv6()` to intelligently detect IPv6 addresses without manual configuration
+- 🔧 **Backward Compatible**: All existing code continues to work; auto-detection only applies to IPv6 addresses
+- ⚙️ **Override Support**: `setIPv4()` and `setIPv6()` methods can still override auto-detection when needed
+- 🧪 **Enhanced Testing**: Added 8 new test cases covering IPv6 auto-detection scenarios and edge cases
+- 📚 **Updated Documentation**: Enhanced IPv4/IPv6 section with auto-detection examples and behavior explanation
+- ✨ **Example Updates**: Added IPv6 auto-detection demonstration to existing examples
 
 ### v1.3.0 (2025-07-28)
 - 🌐 **IPv4/IPv6 Support**: Full dual-stack networking support with platform-specific command handling

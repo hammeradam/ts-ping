@@ -1,5 +1,6 @@
 import type { SpawnSyncReturns } from 'node:child_process'
 import { spawn, spawnSync } from 'node:child_process'
+import { isIPv6 } from 'node:net'
 import os from 'node:os'
 import { PingResult } from './ping-result.ts'
 
@@ -27,8 +28,22 @@ export class Ping {
     this.intervalInSeconds = intervalInSeconds
     this.packetSizeInBytes = packetSizeInBytes
     this.ttl = ttl
-    this.ipVersion = undefined
+    this.ipVersion = this.autoDetectIPVersion(hostname)
     this.currentCommand = []
+  }
+
+  /**
+   * Auto-detects the IP version based on the hostname.
+   * Only sets IP version for IPv6 addresses to ensure proper command selection on macOS.
+   * IPv4 addresses and hostnames default to undefined (system default).
+   */
+  private autoDetectIPVersion(hostname: string): 4 | 6 | undefined {
+    // Only auto-detect IPv6 addresses for macOS compatibility
+    // IPv4 addresses and hostnames can use the default ping command
+    if (isIPv6(hostname)) {
+      return 6
+    }
+    return undefined
   }
 
   run(): PingResult {

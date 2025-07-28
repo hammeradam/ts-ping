@@ -56,6 +56,22 @@ async function demonstrateIPVersions() {
     console.log(`❌ Default ping failed: ${resultDefault.error}\n`)
   }
 
+  // Test IPv6 auto-detection (NEW FEATURE)
+  console.log('📡 Testing IPv6 auto-detection...')
+  const pingAutoDetect = new Ping('2001:4860:4860::8888').setCount(1)
+  console.log(`   Auto-detected IP version: ${pingAutoDetect.ipVersion}`)
+  const resultAutoDetect = pingAutoDetect.run()
+
+  if (resultAutoDetect.isSuccess()) {
+    console.log(`✅ Auto-detected IPv${resultAutoDetect.ipVersion} ping successful`)
+    console.log(`   Host: ${resultAutoDetect.host}`)
+    console.log(`   Average time: ${resultAutoDetect.averageTimeInMs}ms\n`)
+  }
+  else {
+    console.log(`❌ Auto-detected IPv6 ping failed: ${resultAutoDetect.error}`)
+    console.log(`   (IPv6 may not be available on this network)\n`)
+  }
+
   // Test with method chaining
   console.log('📡 Testing with method chaining and IPv6...')
   const chainedResult = new Ping('google.com')

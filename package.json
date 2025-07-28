@@ -1,0 +1,75 @@
+{
+  "name": "ts-ping",
+  "type": "module",
+  "version": "1.0.0",
+  "description": "A modern TypeScript library for performing ICMP ping operations with type-safe results and fluent configuration.",
+  "author": "Hammer Ádám",
+  "license": "MIT",
+  "keywords": [
+    "ping",
+    "icmp",
+    "typescript",
+    "networking",
+    "nodejs",
+    "node",
+    "utility",
+    "async",
+    "promise",
+    "fluent",
+    "type-safe",
+    "cross-platform"
+  ],
+  "homepage": "https://github.com/yourusername/ts-ping#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yourusername/ts-ping.git"
+  },
+  "bugs": {
+    "url": "https://github.com/yourusername/ts-ping/issues"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "main": "dist/index.cjs",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsup src/index.ts --format cjs,esm --dts",
+    "dev": "tsx src/example.ts",
+    "lint": "eslint",
+    "lint:fix": "eslint --fix",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "typecheck": "tsc --noEmit",
+    "prepublishOnly": "npm run build && npm run test && npm run lint",
+    "release:patch": "npm version patch && npm publish",
+    "release:minor": "npm version minor && npm publish",
+    "release:major": "npm version major && npm publish"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "devDependencies": {
+    "@antfu/eslint-config": "^5.0.0",
+    "@types/node": "^24.1.0",
+    "@vitest/coverage-v8": "^3.2.4",
+    "eslint": "^9.31.0",
+    "lint-staged": "^16.1.2",
+    "simple-git-hooks": "^2.13.0",
+    "tsup": "^8.5.0",
+    "vitest": "^3.2.4"
+  }
+}

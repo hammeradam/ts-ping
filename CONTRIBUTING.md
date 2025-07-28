@@ -20,7 +20,7 @@ This project adheres to a code of conduct that all contributors are expected to 
 1. Fork the repository
 2. Clone your fork:
    ```bash
-   git clone https://github.com/yourusername/ts-ping.git
+   git clone https://github.com/hammeradam/ts-ping.git
    cd ts-ping
    ```
 3. Install dependencies:

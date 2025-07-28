@@ -1,8 +1,8 @@
 # ts-ping
 
 [![npm version](https://badge.fury.io/js/ts-ping.svg)](https://badge.fury.io/js/ts-ping)
-[![CI](https://github.com/yourusername/ts-ping/workflows/CI/badge.svg)](https://github.com/yourusername/ts-ping/actions)
-[![codecov](https://codecov.io/gh/yourusername/ts-ping/branch/main/graph/badge.svg)](https://codecov.io/gh/yourusername/ts-ping)
+[![CI](https://github.com/hammeradam/ts-ping/workflows/CI/badge.svg)](https://github.com/hammeradam/ts-ping/actions)
+[![codecov](https://codecov.io/gh/hammeradam/ts-ping/branch/main/graph/badge.svg)](https://codecov.io/gh/hammeradam/ts-ping)
 [![TypeScript](https://img.shields.io/badge/%3C%2F%3E-TypeScript-%230074c1.svg)](http://www.typescriptlang.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 

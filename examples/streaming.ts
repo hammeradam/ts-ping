@@ -1,6 +1,6 @@
 import process from 'node:process'
-import { PingStream } from './ping-stream.ts'
-import { Ping } from './ping.ts'
+import { PingStream } from '../src/ping-stream.ts'
+import { Ping } from '../src/ping.ts'
 
 /**
  * Example demonstrating the new streaming capabilities of ts-ping.

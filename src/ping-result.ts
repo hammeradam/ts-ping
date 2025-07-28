@@ -63,6 +63,7 @@ interface PingResultOptions {
   interval: number
   packetSize: number
   ttl: number
+  ipVersion?: 4 | 6
 }
 
 interface PingResultData {
@@ -76,6 +77,7 @@ interface PingResultData {
   intervalInSeconds: number
   packetSizeInBytes: number
   ttl: number
+  ipVersion?: 4 | 6
   minimumTimeInMs: number | null
   maximumTimeInMs: number | null
   averageTimeInMs: number | null
@@ -96,6 +98,7 @@ export interface PingResultArray {
     interval: number
     packet_size_in_bytes: number
     ttl: number
+    ip_version?: 4 | 6
   }
   timings: {
     minimum_time_in_ms: number | null
@@ -136,6 +139,7 @@ export class PingResult {
   public readonly intervalInSeconds: number
   public readonly packetSizeInBytes: number
   public readonly ttl: number
+  public readonly ipVersion?: 4 | 6
   public readonly minimumTimeInMs: number | null
   public readonly maximumTimeInMs: number | null
   public readonly averageTimeInMs: number | null
@@ -154,6 +158,7 @@ export class PingResult {
     this.intervalInSeconds = data.intervalInSeconds
     this.packetSizeInBytes = data.packetSizeInBytes
     this.ttl = data.ttl
+    this.ipVersion = data.ipVersion
     this.minimumTimeInMs = data.minimumTimeInMs
     this.maximumTimeInMs = data.maximumTimeInMs
     this.averageTimeInMs = data.averageTimeInMs
@@ -170,7 +175,7 @@ export class PingResult {
     return !this.success
   }
 
-  static fromPingOutput({ output, returnCode, host, timeout, interval, packetSize, ttl }: PingResultOptions): PingResult {
+  static fromPingOutput({ output, returnCode, host, timeout, interval, packetSize, ttl, ipVersion }: PingResultOptions): PingResult {
     const rawOutput = output.join('\n')
 
     if (returnCode !== 0) {
@@ -186,6 +191,7 @@ export class PingResult {
         intervalInSeconds: interval,
         packetSizeInBytes: packetSize,
         ttl,
+        ipVersion,
         minimumTimeInMs: null,
         maximumTimeInMs: null,
         averageTimeInMs: null,
@@ -245,6 +251,7 @@ export class PingResult {
       intervalInSeconds: interval,
       packetSizeInBytes: packetSize,
       ttl,
+      ipVersion,
       minimumTimeInMs,
       maximumTimeInMs,
       averageTimeInMs,
@@ -266,6 +273,7 @@ export class PingResult {
       interval: number
       packetSize: number
       ttl: number
+      ipVersion?: 4 | 6
     },
   ): PingResult {
     const errorType = PingResult.determineErrorFromMessage(error.message)
@@ -281,6 +289,7 @@ export class PingResult {
       intervalInSeconds: options.interval,
       packetSizeInBytes: options.packetSize,
       ttl: options.ttl,
+      ipVersion: options.ipVersion,
       minimumTimeInMs: null,
       maximumTimeInMs: null,
       averageTimeInMs: null,
@@ -371,6 +380,7 @@ export class PingResult {
         interval: this.intervalInSeconds,
         packet_size_in_bytes: this.packetSizeInBytes,
         ttl: this.ttl,
+        ip_version: this.ipVersion,
       },
       timings: {
         minimum_time_in_ms: this.minimumTimeInMs,

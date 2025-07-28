@@ -13,6 +13,7 @@ A modern TypeScript library for performing ICMP ping operations with type-safe r
 - 🎯 **Type-Safe**: Built with TypeScript and discriminated union types for reliable type checking
 - 🔧 **Fluent Interface**: Chainable methods for easy configuration
 - 🌍 **Cross-Platform**: Works on Windows, macOS, and Linux with platform-specific optimizations
+- 🌐 **IPv4/IPv6 Support**: Full dual-stack support with platform-specific command handling
 - 📊 **Comprehensive Results**: Detailed ping statistics including packet loss, timing, and error information
 - 🌊 **Streaming Support**: Real-time ping monitoring with async generators and advanced utilities
 - 📈 **Live Statistics**: Rolling statistics calculation with jitter, packet loss, and performance metrics
@@ -176,6 +177,56 @@ ping.setCount(5) // Set number of pings
 ping.setInterval(2.0) // Set interval between pings
 ping.setPacketSize(128) // Set packet size in bytes
 ping.setTtl(32) // Set Time To Live
+ping.setIPVersion(4) // Set IP version (4 or 6)
+ping.setIPv4() // Force IPv4 (convenience method)
+ping.setIPv6() // Force IPv6 (convenience method)
+```
+
+#### IPv4/IPv6 Support
+
+Control which IP version to use for ping operations:
+
+```typescript
+// Force IPv4
+const ping4 = new Ping('google.com').setIPv4()
+const result4 = ping4.run()
+
+// Force IPv6
+const ping6 = new Ping('google.com').setIPv6()
+const result6 = ping6.run()
+
+// Or use setIPVersion method
+const ping = new Ping('google.com').setIPVersion(6)
+
+// Works with all other options
+const result = new Ping('dual-stack.example.com')
+  .setIPv6()
+  .setCount(3)
+  .setTimeout(5)
+  .run()
+
+if (result.isSuccess()) {
+  console.log(`IPv${result.ipVersion} ping successful`)
+  console.log(`Host: ${result.host}`)
+}
+```
+
+**Platform Support:**
+- **macOS**: Uses `ping` for IPv4 and `ping6` for IPv6
+- **Linux/Windows**: Uses `ping -4` for IPv4 and `ping -6` for IPv6
+- **Default**: When no IP version is specified, uses the system default (usually IPv4)
+
+**Streaming with IP Version:**
+```typescript
+// Monitor IPv6 connectivity
+const ping = new Ping('ipv6.google.com').setIPv6().setInterval(1)
+for await (const result of ping.stream()) {
+  if (result.isSuccess()) {
+    console.log(`IPv6 ping: ${result.averageResponseTimeInMs()}ms`)
+  } else {
+    console.log(`IPv6 ping failed: ${result.error}`)
+  }
+}
 ```
 
 #### Method Chaining Example
@@ -186,6 +237,7 @@ const result = new Ping('example.com')
   .setCount(5)
   .setInterval(1.5)
   .setPacketSize(128)
+  .setIPv6()
   .run()
 ```
 
@@ -456,6 +508,32 @@ result.timeoutInSeconds // number | null
 result.intervalInSeconds // number
 result.packetSizeInBytes // number
 result.ttl // number
+result.ipVersion // 4 | 6 | undefined - IP version used for the ping
+```
+
+#### IP Version Information
+
+When IPv4 or IPv6 is explicitly set, the result includes the IP version:
+
+```typescript
+const ping4 = new Ping('google.com').setIPv4()
+const result4 = ping4.run()
+
+if (result4.isSuccess()) {
+  console.log(`Used IPv${result4.ipVersion}`) // "Used IPv4"
+}
+
+const ping6 = new Ping('google.com').setIPv6()
+const result6 = ping6.run()
+
+if (result6.isSuccess()) {
+  console.log(`Used IPv${result6.ipVersion}`) // "Used IPv6"
+}
+
+// When no IP version is specified, ipVersion is undefined
+const pingDefault = new Ping('google.com')
+const resultDefault = pingDefault.run()
+console.log(resultDefault.ipVersion) // undefined
 ```
 
 ### Error Types
@@ -883,6 +961,17 @@ MIT License - see LICENSE file for details.
 Contributions are welcome! Please read the contributing guidelines and ensure all tests pass before submitting a pull request.
 
 ## Changelog
+
+### v1.3.0 (2025-07-28)
+- 🌐 **IPv4/IPv6 Support**: Full dual-stack networking support with platform-specific command handling
+- 🔧 **New IP Version Methods**: Added `setIPVersion(4|6)`, `setIPv4()`, and `setIPv6()` for explicit IP version control
+- 📊 **Enhanced Results**: Added `ipVersion` property to `PingResult` with IP version information
+- 🖥️ **Platform-Specific Commands**: 
+  - macOS: Uses `ping` for IPv4 and `ping6` for IPv6
+  - Linux/Windows: Uses `ping -4` for IPv4 and `ping -6` for IPv6
+- 🌊 **Streaming IP Support**: IP version information preserved in streaming results
+- 🧪 **Comprehensive Testing**: 30+ new tests covering all IPv4/IPv6 platform scenarios
+- 📚 **Enhanced Documentation**: New IPv4/IPv6 section with usage examples and API reference
 
 ### v1.2.0 (2025-07-28)
 - 🪟 **Enhanced Windows Support**: Improved Windows compatibility with correct ping command arguments

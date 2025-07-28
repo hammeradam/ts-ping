@@ -10,6 +10,7 @@ export class Ping {
   public intervalInSeconds: number
   public packetSizeInBytes: number
   public ttl: number
+  public ipVersion?: 4 | 6
   private currentCommand: string[]
 
   constructor(
@@ -26,6 +27,7 @@ export class Ping {
     this.intervalInSeconds = intervalInSeconds
     this.packetSizeInBytes = packetSizeInBytes
     this.ttl = ttl
+    this.ipVersion = undefined
     this.currentCommand = []
   }
 
@@ -42,6 +44,7 @@ export class Ping {
       interval: this.intervalInSeconds,
       packetSize: this.packetSizeInBytes,
       ttl: this.ttl,
+      ipVersion: this.ipVersion,
     })
   }
 
@@ -58,6 +61,7 @@ export class Ping {
       interval: this.intervalInSeconds,
       packetSize: this.packetSizeInBytes,
       ttl: this.ttl,
+      ipVersion: this.ipVersion,
     })
   }
 
@@ -187,6 +191,11 @@ export class Ping {
       this.ttl,
     )
 
+    // Copy IP version setting
+    if (this.ipVersion) {
+      singlePing.setIPVersion(this.ipVersion)
+    }
+
     return await singlePing.runAsync()
   }
 
@@ -296,8 +305,22 @@ export class Ping {
     return this
   }
 
+  setIPVersion(version: 4 | 6): Ping {
+    this.ipVersion = version
+    return this
+  }
+
+  setIPv4(): Ping {
+    return this.setIPVersion(4)
+  }
+
+  setIPv6(): Ping {
+    return this.setIPVersion(6)
+  }
+
   buildPingCommand(): string[] {
     return this.startWithPingCommand()
+      .addIPVersionOption()
       .addPacketCountOption()
       .addTimeoutOption()
       .addOptionalIntervalOption()
@@ -308,7 +331,27 @@ export class Ping {
   }
 
   startWithPingCommand(): Ping {
-    this.currentCommand = ['ping']
+    if (this.isRunningOnMacOS() && this.ipVersion === 6) {
+      // macOS uses separate ping6 command for IPv6
+      this.currentCommand = ['ping6']
+    }
+    else {
+      this.currentCommand = ['ping']
+    }
+    return this
+  }
+
+  addIPVersionOption(): Ping {
+    // Only add -4/-6 flags on Linux and Windows
+    // macOS uses separate ping6 command which is handled in startWithPingCommand
+    if (!this.isRunningOnMacOS() && this.ipVersion) {
+      if (this.ipVersion === 4) {
+        this.currentCommand.push('-4')
+      }
+      else if (this.ipVersion === 6) {
+        this.currentCommand.push('-6')
+      }
+    }
     return this
   }
 

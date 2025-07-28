@@ -49,17 +49,14 @@
   },
   "scripts": {
     "build": "tsup src/index.ts --format cjs,esm --dts",
-    "dev": "tsx src/example.ts",
+    "dev": "node --experimental-strip-types src/example.ts",
     "lint": "eslint",
     "lint:fix": "eslint --fix",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
     "typecheck": "tsc --noEmit",
-    "prepublishOnly": "pnpm run build && pnpm run test && pnpm run lint",
-    "release:patch": "pnpm version patch && pnpm publish",
-    "release:minor": "pnpm version minor && pnpm publish",
-    "release:major": "pnpm version major && pnpm publish"
+    "prepublishOnly": "pnpm run build && pnpm run test && pnpm run lint"
   },
   "publishConfig": {
     "access": "public"
@@ -72,6 +69,7 @@
     "lint-staged": "^16.1.2",
     "simple-git-hooks": "^2.13.0",
     "tsup": "^8.5.0",
+    "typescript": "^5.8.3",
     "vitest": "^3.2.4"
   }
 }

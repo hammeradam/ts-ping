@@ -460,5 +460,35 @@ describe('ping', () => {
         expect(ping.convertTimeoutToMilliseconds()).toBe(2500)
       })
     })
+
+    describe('edge cases and error handling', () => {
+      it('should throw error when executePingCommand is called with empty command array', () => {
+        const ping = new Ping('google.com')
+
+        expect(() => {
+          ping.executePingCommand([])
+        }).toThrow('No command specified')
+      })
+
+      it('should throw error when executePingCommand is called with undefined command', () => {
+        const ping = new Ping('google.com')
+
+        expect(() => {
+          ping.executePingCommand([undefined as any])
+        }).toThrow('No command specified')
+      })
+
+      it('should reject promise when executePingCommandAsync is called with empty command array', async () => {
+        const ping = new Ping('google.com')
+
+        await expect(ping.executePingCommandAsync([])).rejects.toThrow('No command specified')
+      })
+
+      it('should reject promise when executePingCommandAsync is called with undefined command', async () => {
+        const ping = new Ping('google.com')
+
+        await expect(ping.executePingCommandAsync([undefined as any])).rejects.toThrow('No command specified')
+      })
+    })
   })
 })

@@ -413,5 +413,72 @@ describe('pingResult', () => {
         expect(result.standardDeviationTimeInMs).toBeNull()
       }
     })
+
+    describe('fallback packet loss parsing', () => {
+      it('should parse packet loss using fallback regex when transmitted packets info is missing', () => {
+        // This tests the fallback parsing on lines 231-232 in ping-result.ts
+        const options: PingResultOptions = {
+          output: [
+            'PING google.com (142.250.191.14): 56 data bytes',
+            '64 bytes from 142.250.191.14: icmp_seq=0 time=10.123 ms',
+            'Some unusual output format',
+            '25% packet loss', // This should trigger the fallback regex
+          ],
+          returnCode: 0,
+          host: 'google.com',
+          timeout: 5,
+          interval: 1,
+          packetSize: 56,
+          ttl: 64,
+        }
+
+        const result = PingResult.fromPingOutput(options)
+
+        expect(result.isSuccess()).toBe(true)
+        expect(result.success).toBe(true)
+        expect(result.packetLossPercentage).toBe(25)
+      })
+
+      it('should handle fallback packet loss parsing with different formats', () => {
+        const options: PingResultOptions = {
+          output: [
+            'PING google.com (142.250.191.14): 56 data bytes',
+            '64 bytes from 142.250.191.14: icmp_seq=0 time=10.123 ms',
+            'Custom format: 15% loss', // Another format that should trigger fallback
+          ],
+          returnCode: 0,
+          host: 'google.com',
+          timeout: 5,
+          interval: 1,
+          packetSize: 56,
+          ttl: 64,
+        }
+
+        const result = PingResult.fromPingOutput(options)
+
+        expect(result.packetLossPercentage).toBe(15)
+      })
+
+      it('should handle fallback packet loss parsing with 100% loss triggering failure', () => {
+        const options: PingResultOptions = {
+          output: [
+            'PING google.com (142.250.191.14): 56 data bytes',
+            'Custom format: 100% packet loss', // 100% loss should make it a failure
+          ],
+          returnCode: 0,
+          host: 'google.com',
+          timeout: 5,
+          interval: 1,
+          packetSize: 56,
+          ttl: 64,
+        }
+
+        const result = PingResult.fromPingOutput(options)
+
+        expect(result.isFailure()).toBe(true)
+        expect(result.success).toBe(false)
+        expect(result.packetLossPercentage).toBe(100)
+      })
+    })
   })
 })

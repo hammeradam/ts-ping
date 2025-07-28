@@ -17,6 +17,7 @@ A modern TypeScript library for performing ICMP ping operations with type-safe r
 - 🌊 **Streaming Support**: Real-time ping monitoring with async generators and advanced utilities
 - 📈 **Live Statistics**: Rolling statistics calculation with jitter, packet loss, and performance metrics
 - 🔄 **Memory Efficient**: Generator-based streaming that doesn't load all results into memory
+- 📦 **Zero Dependencies**: No external dependencies - lightweight and secure
 - 🧪 **Well-Tested**: 90%+ test coverage with comprehensive test suite
 - 🚀 **Modern**: Uses ES modules and modern JavaScript features
 

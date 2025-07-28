@@ -358,9 +358,6 @@ export class PingStream {
  * Utility function to combine multiple async iterators into a single stream.
  * Results are yielded as soon as they become available from any iterator.
  *
- * Note: This is a simplified implementation. For production use, consider using
- * libraries like `ix/asynciterable` for more robust iterator combining.
- *
  * @param iterators Multiple async iterators to combine
  *
  * @example

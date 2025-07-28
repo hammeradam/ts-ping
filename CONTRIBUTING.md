@@ -10,7 +10,7 @@ This project adheres to a code of conduct that all contributors are expected to 
 
 ### Prerequisites
 
-- Node.js 18 or higher
+- Node.js 20 or higher
 - pnpm 8 or higher (recommended) or npm
 - TypeScript 5+
 - macOS or Linux (for testing ping functionality)

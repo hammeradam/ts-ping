@@ -32,7 +32,7 @@ What actually happened instead.
 ## Environment
 
 - **OS**: [e.g. macOS 14.0, Ubuntu 22.04]
-- **Node.js version**: [e.g. 18.17.0]
+- **Node.js version**: [e.g. 20.17.0]
 - **ts-ping version**: [e.g. 1.0.0]
 - **TypeScript version**: [e.g. 5.2.0]
 

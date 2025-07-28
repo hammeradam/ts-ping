@@ -431,7 +431,7 @@ pnpm run lint:fix        # Fix linting issues automatically
 
 ## Requirements
 
-- Node.js 18+
+- Node.js 20+
 - pnpm 8+ (recommended) or npm/yarn
 - TypeScript 5+
 - macOS or Linux (ping command must be available)

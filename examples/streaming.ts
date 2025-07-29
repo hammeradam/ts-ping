@@ -13,7 +13,6 @@
  * - Health check patterns
  */
 
-import process from 'node:process'
 import { PingStream } from '../src/ping-stream.ts'
 import { Ping } from '../src/ping.ts'
 

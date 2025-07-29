@@ -10,17 +10,17 @@ A modern TypeScript library for performing ICMP ping operations with type-safe r
 
 ## Features
 
-- 🎯 **Type-Safe**: Built with TypeScript and discriminated union types for reliable type checking
-- 🔧 **Fluent Interface**: Chainable methods for easy configuration
-- 🌍 **Cross-Platform**: Works on Windows, macOS, and Linux with platform-specific optimizations
-- 🌐 **IPv4/IPv6 Support**: Full dual-stack support with automatic IPv6 detection and platform-specific command handling
-- 📊 **Comprehensive Results**: Detailed ping statistics including packet loss, timing, and error information
-- 🌊 **Streaming Support**: Real-time ping monitoring with async generators and advanced utilities
-- 📈 **Live Statistics**: Rolling statistics calculation with jitter, packet loss, and performance metrics
-- 🔄 **Memory Efficient**: Generator-based streaming that doesn't load all results into memory
-- 📦 **Zero Dependencies**: No external dependencies - lightweight and secure
-- 🧪 **Well-Tested**: 90%+ test coverage with comprehensive test suite
-- 🚀 **Modern**: Uses ES modules and modern JavaScript features
+- **Type-Safe**: Built with TypeScript and discriminated union types for reliable type checking
+- **Fluent Interface**: Chainable methods for easy configuration
+- **Cross-Platform**: Works on Windows, macOS, and Linux with platform-specific optimizations
+- **IPv4/IPv6 Support**: Full dual-stack support with automatic IPv6 detection and platform-specific command handling
+- **Comprehensive Results**: Detailed ping statistics including packet loss, timing, and error information
+- **Streaming Support**: Real-time ping monitoring with async generators and advanced utilities
+- **Live Statistics**: Rolling statistics calculation with jitter, packet loss, and performance metrics
+- **Memory Efficient**: Generator-based streaming that doesn't load all results into memory
+- **Zero Dependencies**: No external dependencies - lightweight and secure
+- **Well-Tested**: 90%+ test coverage with comprehensive test suite
+- **Modern**: Uses ES modules and modern JavaScript features
 
 ## Installation
 
@@ -633,12 +633,12 @@ async function networkMonitor() {
     
     // Alert on high latency
     if (stats.average > 100) {
-      console.log('⚠️  High latency detected!')
+      console.log('WARNING: High latency detected!')
     }
     
     // Alert on packet loss
     if (stats.packetLoss > 5) {
-      console.log('🚨 Packet loss detected!')
+      console.log('ALERT: Packet loss detected!')
     }
   }
 }
@@ -659,7 +659,7 @@ async function monitorFailures() {
   
   // Only process failures for alerting
   for await (const failure of stream.skipSuccesses().take(5)) {
-    console.error(`❌ Ping failed: ${failure.error}`)
+    console.error(`Ping failed: ${failure.error}`)
     console.error(`   Host: ${failure.host}`)
     console.error(`   Time: ${new Date().toISOString()}`)
     
@@ -670,7 +670,7 @@ async function monitorFailures() {
 
 async function sendSlackAlert(message: string) {
   // Implementation would send to Slack/Discord/etc
-  console.log(`🔔 Alert: ${message}`)
+  console.log(`Alert: ${message}`)
 }
 
 monitorFailures()
@@ -692,14 +692,14 @@ async function batchProcessor() {
     const successful = batch.filter(r => r.isSuccess())
     const failed = batch.filter(r => r.isFailure())
     
-    console.log(`✅ Successful: ${successful.length}`)
-    console.log(`❌ Failed: ${failed.length}`)
+    console.log(`Successful: ${successful.length}`)
+    console.log(`Failed: ${failed.length}`)
     
     if (successful.length > 0) {
       const avgLatency = successful
         .map(r => r.averageResponseTimeInMs())
         .reduce((sum, lat) => sum + lat, 0) / successful.length
-      console.log(`📊 Average latency: ${avgLatency.toFixed(1)}ms`)
+      console.log(`Average latency: ${avgLatency.toFixed(1)}ms`)
     }
     
     // Save to database, send metrics, etc.
@@ -708,7 +708,7 @@ async function batchProcessor() {
 }
 
 async function saveToDatabase(batch: any[]) {
-  console.log(`💾 Saved ${batch.length} results to database`)
+  console.log(`Saved ${batch.length} results to database`)
 }
 
 batchProcessor()
@@ -734,8 +734,8 @@ async function multiHostMonitor() {
   
   for await (const result of combined) {
     const status = result.isSuccess() 
-      ? `✅ ${result.averageResponseTimeInMs()}ms`
-      : `❌ ${result.error}`
+      ? `${result.averageResponseTimeInMs()}ms`
+      : `${result.error}`
     
     console.log(`${result.host}: ${status}`)
     
@@ -911,13 +911,13 @@ import { FailedPingResult, Ping, PingResult, PingStream, SuccessfulPingResult } 
 function handlePingResult(result: PingResult) {
   if (result.isSuccess()) {
     // result is automatically narrowed to SuccessfulPingResult
-    const host: string = result.host // ✅ string
-    const transmitted: number = result.numberOfPacketsTransmitted // ✅ number
+    const host: string = result.host // string
+    const transmitted: number = result.numberOfPacketsTransmitted // number
   }
   else {
     // result is automatically narrowed to FailedPingResult
-    const error: PingErrorType = result.error // ✅ PingErrorType
-    const loss: 100 = result.packetLossPercentage // ✅ exactly 100
+    const error: PingErrorType = result.error // PingErrorType
+    const loss: 100 = result.packetLossPercentage // exactly 100
   }
 }
 
@@ -976,50 +976,50 @@ Contributions are welcome! Please read the contributing guidelines and ensure al
 ## Changelog
 
 ### v1.4.0 (2025-07-28)
-- 🔍 **IPv6 Auto-Detection**: Automatically detects IPv6 addresses and uses appropriate ping commands on all platforms
-- 🍎 **macOS IPv6 Fix**: Resolves IPv6 ping failures on macOS by auto-selecting `ping6` command for IPv6 addresses
-- 🧠 **Smart IP Detection**: Uses Node.js `isIPv6()` to intelligently detect IPv6 addresses without manual configuration
-- 🔧 **Backward Compatible**: All existing code continues to work; auto-detection only applies to IPv6 addresses
-- ⚙️ **Override Support**: `setIPv4()` and `setIPv6()` methods can still override auto-detection when needed
-- 🧪 **Enhanced Testing**: Added 8 new test cases covering IPv6 auto-detection scenarios and edge cases
-- 📚 **Updated Documentation**: Enhanced IPv4/IPv6 section with auto-detection examples and behavior explanation
-- ✨ **Example Updates**: Added IPv6 auto-detection demonstration to existing examples
+- **IPv6 Auto-Detection**: Automatically detects IPv6 addresses and uses appropriate ping commands on all platforms
+- **macOS IPv6 Fix**: Resolves IPv6 ping failures on macOS by auto-selecting `ping6` command for IPv6 addresses
+- **Smart IP Detection**: Uses Node.js `isIPv6()` to intelligently detect IPv6 addresses without manual configuration
+- **Backward Compatible**: All existing code continues to work; auto-detection only applies to IPv6 addresses
+- **Override Support**: `setIPv4()` and `setIPv6()` methods can still override auto-detection when needed
+- **Enhanced Testing**: Added 8 new test cases covering IPv6 auto-detection scenarios and edge cases
+- **Updated Documentation**: Enhanced IPv4/IPv6 section with auto-detection examples and behavior explanation
+- **Example Updates**: Added IPv6 auto-detection demonstration to existing examples
 
 ### v1.3.0 (2025-07-28)
-- 🌐 **IPv4/IPv6 Support**: Full dual-stack networking support with platform-specific command handling
-- 🔧 **New IP Version Methods**: Added `setIPVersion(4|6)`, `setIPv4()`, and `setIPv6()` for explicit IP version control
-- 📊 **Enhanced Results**: Added `ipVersion` property to `PingResult` with IP version information
-- 🖥️ **Platform-Specific Commands**: 
+- **IPv4/IPv6 Support**: Full dual-stack networking support with platform-specific command handling
+- **New IP Version Methods**: Added `setIPVersion(4|6)`, `setIPv4()`, and `setIPv6()` for explicit IP version control
+- **Enhanced Results**: Added `ipVersion` property to `PingResult` with IP version information
+- **Platform-Specific Commands**: 
   - macOS: Uses `ping` for IPv4 and `ping6` for IPv6
   - Linux/Windows: Uses `ping -4` for IPv4 and `ping -6` for IPv6
-- 🌊 **Streaming IP Support**: IP version information preserved in streaming results
-- 🧪 **Comprehensive Testing**: 30+ new tests covering all IPv4/IPv6 platform scenarios
-- 📚 **Enhanced Documentation**: New IPv4/IPv6 section with usage examples and API reference
+- **Streaming IP Support**: IP version information preserved in streaming results
+- **Comprehensive Testing**: 30+ new tests covering all IPv4/IPv6 platform scenarios
+- **Enhanced Documentation**: New IPv4/IPv6 section with usage examples and API reference
 
 ### v1.2.0 (2025-07-28)
-- 🪟 **Enhanced Windows Support**: Improved Windows compatibility with correct ping command arguments
-- 🔧 **Platform-Specific Commands**: Windows uses `-n` for count, `-w` for timeout, `-l` for packet size, `-i` for TTL
-- 🧹 **Code Cleanup**: Removed non-existent `-O` flag functionality
-- ✅ **Comprehensive Testing**: Added dedicated Windows support tests with platform detection
-- 📚 **Updated Documentation**: Clarified platform-specific ping command differences
+- **Enhanced Windows Support**: Improved Windows compatibility with correct ping command arguments
+- **Platform-Specific Commands**: Windows uses `-n` for count, `-w` for timeout, `-l` for packet size, `-i` for TTL
+- **Code Cleanup**: Removed non-existent `-O` flag functionality
+- **Comprehensive Testing**: Added dedicated Windows support tests with platform detection
+- **Updated Documentation**: Clarified platform-specific ping command differences
 
 ### v1.1.0 (2025-07-28)
-- 🌊 **New Streaming Support**: Added async generator-based streaming for real-time ping monitoring
-- 📈 **PingStream Utilities**: Advanced stream processing with filtering, mapping, windowing, and statistics
-- 📊 **Rolling Statistics**: Live calculation of latency, jitter, packet loss, and performance metrics
-- 🔄 **Memory Efficient**: Generator-based streaming that doesn't load all results into memory
-- 🪟 **Windows Support**: Full Windows compatibility with platform-specific ping command handling
-- 🎯 **Type-Safe Streams**: Full TypeScript support for async generators and streaming operations
-- 🧰 **Stream Utilities**: `combineAsyncIterators`, batching, filtering, and transformation utilities
-- 📚 **Enhanced Documentation**: Comprehensive examples for streaming and real-time monitoring
-- 🧪 **Improved Coverage**: Test coverage increased to 92%+ with extensive streaming tests
+- **New Streaming Support**: Added async generator-based streaming for real-time ping monitoring
+- **PingStream Utilities**: Advanced stream processing with filtering, mapping, windowing, and statistics
+- **Rolling Statistics**: Live calculation of latency, jitter, packet loss, and performance metrics
+- **Memory Efficient**: Generator-based streaming that doesn't load all results into memory
+- **Windows Support**: Full Windows compatibility with platform-specific ping command handling
+- **Type-Safe Streams**: Full TypeScript support for async generators and streaming operations
+- **Stream Utilities**: `combineAsyncIterators`, batching, filtering, and transformation utilities
+- **Enhanced Documentation**: Comprehensive examples for streaming and real-time monitoring
+- **Improved Coverage**: Test coverage increased to 92%+ with extensive streaming tests
 
 ### v1.0.0 (2025-07-28)
-- 🎉 Initial release with TypeScript support
-- ✨ Discriminated union types for type-safe results
-- 🔄 Fluent interface for configuration
-- 🌍 Cross-platform support (Windows/macOS/Linux)
-- ⚡ Async support with `runAsync()` method
-- 🧪 Comprehensive test suite with 94%+ coverage
-- 📚 Complete documentation with examples
-- 🔒 Security policy and contribution guidelines
+- Initial release with TypeScript support
+- Discriminated union types for type-safe results
+- Fluent interface for configuration
+- Cross-platform support (Windows/macOS/Linux)
+- Async support with `runAsync()` method
+- Comprehensive test suite with 94%+ coverage
+- Complete documentation with examples
+- Security policy and contribution guidelines

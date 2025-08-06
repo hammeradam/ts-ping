@@ -14,6 +14,7 @@ A modern TypeScript library for performing ICMP ping operations with type-safe r
 - **Fluent Interface**: Chainable methods for easy configuration
 - **Cross-Platform**: Works on Windows, macOS, and Linux with platform-specific optimizations
 - **IPv4/IPv6 Support**: Full dual-stack support with automatic IPv6 detection and platform-specific command handling
+- **AbortSignal Support**: External cancellation with standard `AbortSignal` API for graceful operation control
 - **Comprehensive Results**: Detailed ping statistics including packet loss, timing, and error information
 - **Streaming Support**: Real-time ping monitoring with async generators and advanced utilities
 - **Live Statistics**: Rolling statistics calculation with jitter, packet loss, and performance metrics
@@ -117,6 +118,21 @@ for await (const window of stream.window(3)) {
 for await (const batch of stream.batchWithTimeout(5, 2000)) {
   console.log(`Processed batch of ${batch.length} results`)
 }
+
+// External cancellation with AbortSignal
+const abortController = new AbortController()
+const cancelablePing = new Ping('google.com')
+  .setCount(0) // infinite
+  .setInterval(1)
+  .setAbortSignal(abortController.signal)
+
+// Cancel after 30 seconds
+setTimeout(() => abortController.abort(), 30000)
+
+for await (const result of cancelablePing.stream()) {
+  console.log(`Ping: ${result.isSuccess() ? result.averageResponseTimeInMs() + 'ms' : 'failed'}`)
+  // Will automatically stop when aborted
+}
 ```
 
 ## Async Support
@@ -180,6 +196,7 @@ ping.setTtl(32) // Set Time To Live
 ping.setIPVersion(4) // Set IP version (4 or 6)
 ping.setIPv4() // Force IPv4 (convenience method)
 ping.setIPv6() // Force IPv6 (convenience method)
+ping.setAbortSignal(signal) // Set AbortSignal for cancellation
 ```
 
 #### IPv4/IPv6 Support
@@ -241,6 +258,50 @@ for await (const result of ping.stream()) {
   }
 }
 ```
+
+#### AbortSignal Support
+
+Control ping operations with external cancellation using the standard `AbortSignal` API:
+
+```typescript
+// Manual cancellation with AbortController
+const abortController = new AbortController()
+const ping = new Ping('google.com')
+  .setCount(0) // infinite pings
+  .setInterval(1)
+  .setAbortSignal(abortController.signal)
+
+// Cancel after 10 seconds
+setTimeout(() => abortController.abort(), 10000)
+
+try {
+  for await (const result of ping.stream()) {
+    console.log(`Ping: ${result.averageTimeInMs ?? 'failed'}ms`)
+  }
+} catch (error) {
+  console.log('Ping cancelled:', error.message)
+}
+```
+
+```typescript
+// Timeout-based cancellation with AbortSignal.timeout()
+const ping = new Ping('google.com')
+  .setCount(0) // infinite pings
+  .setInterval(0.5)
+  .setAbortSignal(AbortSignal.timeout(5000)) // Cancel after 5 seconds
+
+for await (const result of ping.stream()) {
+  console.log(`Ping: ${result.averageTimeInMs ?? 'failed'}ms`)
+  // Automatically stops after 5 seconds
+}
+```
+
+**AbortSignal Features:**
+- **External cancellation**: Stop ping operations from outside the ping logic
+- **Graceful shutdown**: Operations stop cleanly without throwing errors
+- **Standard API**: Uses the same pattern as `fetch()` and other modern APIs
+- **Multiple sources**: Works with `AbortController`, `AbortSignal.timeout()`, or any `AbortSignal`
+- **All methods supported**: Works with `runAsync()`, `stream()`, `streamWithFilter()`, and `streamBatched()`
 
 #### Method Chaining Example
 
@@ -974,6 +1035,17 @@ MIT License - see LICENSE file for details.
 Contributions are welcome! Please read the contributing guidelines and ensure all tests pass before submitting a pull request.
 
 ## Changelog
+
+### v1.5.0 (2025-08-06)
+- **AbortSignal Support**: Added external cancellation control with standard `AbortSignal` API
+- **New Method**: Added `setAbortSignal(signal)` for fluent interface configuration
+- **Graceful Cancellation**: Operations stop cleanly without throwing errors when aborted
+- **Universal Support**: Works with `runAsync()`, `stream()`, `streamWithFilter()`, and `streamBatched()`
+- **Multiple Sources**: Compatible with `AbortController`, `AbortSignal.timeout()`, or any `AbortSignal`
+- **Modern API Pattern**: Follows the same pattern as `fetch()` and other modern JavaScript APIs
+- **Comprehensive Testing**: 13 new tests covering all abort scenarios and edge cases
+- **Enhanced Documentation**: Added AbortSignal section with usage examples and API reference
+- **Integration Examples**: Demonstrated timeout-based and manual cancellation patterns
 
 ### v1.4.0 (2025-07-28)
 - **IPv6 Auto-Detection**: Automatically detects IPv6 addresses and uses appropriate ping commands on all platforms

@@ -1,7 +1,7 @@
 {
   "name": "ts-ping",
   "type": "module",
-  "version": "1.4.1",
+  "version": "1.5.0",
   "packageManager": "pnpm@9.6.0",
   "description": "A modern TypeScript library for performing ICMP ping operations with type-safe results and fluent configuration.",
   "author": "Hammer Ádám",
@@ -28,7 +28,11 @@
     "type-safe",
     "cross-platform",
     "ipv4",
-    "ipv6"
+    "ipv6",
+    "abort",
+    "cancellation",
+    "abortSignal",
+    "streaming"
   ],
   "exports": {
     ".": {

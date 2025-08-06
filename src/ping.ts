@@ -12,6 +12,23 @@ export class Ping {
   public packetSizeInBytes: number
   public ttl: number
   public ipVersion?: 4 | 6
+  /**
+   * Optional AbortSignal for external cancellation of ping operations.
+   * When the signal is aborted, all ongoing and future ping operations will be cancelled.
+   *
+   * @example
+   * ```typescript
+   * const abortController = new AbortController()
+   * const ping = new Ping('google.com').setAbortSignal(abortController.signal)
+   *
+   * // Cancel after 5 seconds
+   * setTimeout(() => abortController.abort(), 5000)
+   *
+   * // Or use AbortSignal.timeout for simpler timeout-based cancellation
+   * const ping2 = new Ping('google.com').setAbortSignal(AbortSignal.timeout(5000))
+   * ```
+   */
+  public abortSignal?: AbortSignal
   private currentCommand: string[]
 
   constructor(
@@ -64,6 +81,11 @@ export class Ping {
   }
 
   async runAsync(): Promise<PingResult> {
+    // Check if already aborted
+    if (this.abortSignal?.aborted) {
+      throw new Error('Operation was aborted')
+    }
+
     const command = this.buildPingCommand()
     const result = await this.executePingCommandAsync(command)
     const combinedOutput = this.combineOutputLines(result)
@@ -103,6 +125,11 @@ export class Ping {
 
     while (true) {
       try {
+        // Check if aborted before starting ping
+        if (this.abortSignal?.aborted) {
+          break
+        }
+
         const result = await this.runSinglePing(sequenceNumber++)
         yield result
 
@@ -117,6 +144,11 @@ export class Ping {
         }
       }
       catch (error) {
+        // Check if error is due to abortion
+        if (error instanceof Error && error.message === 'Operation was aborted') {
+          break
+        }
+
         // Yield error result instead of throwing
         yield PingResult.fromError(error as Error, this.hostname, {
           timeout: this.timeoutInSeconds,
@@ -211,6 +243,11 @@ export class Ping {
       singlePing.setIPVersion(this.ipVersion)
     }
 
+    // Copy abort signal setting
+    if (this.abortSignal) {
+      singlePing.setAbortSignal(this.abortSignal)
+    }
+
     return await singlePing.runAsync()
   }
 
@@ -218,7 +255,32 @@ export class Ping {
    * Sleep utility for interval timing.
    */
   private sleep(ms: number): Promise<void> {
-    return new Promise(resolve => setTimeout(resolve, ms))
+    return new Promise((resolve, reject) => {
+      // Check if already aborted
+      if (this.abortSignal?.aborted) {
+        reject(new Error('Operation was aborted'))
+        return
+      }
+
+      const timeoutId = setTimeout(resolve, ms)
+
+      // Handle abort signal
+      const abortListener = () => {
+        clearTimeout(timeoutId)
+        reject(new Error('Operation was aborted'))
+      }
+
+      if (this.abortSignal) {
+        this.abortSignal.addEventListener('abort', abortListener, { once: true })
+      }
+
+      // Clean up listener when promise resolves
+      setTimeout(() => {
+        if (this.abortSignal) {
+          this.abortSignal.removeEventListener('abort', abortListener)
+        }
+      }, ms)
+    })
   }
 
   executePingCommand(commandArray: string[]): SpawnSyncReturns<string> {
@@ -242,6 +304,12 @@ export class Ping {
         return
       }
 
+      // Check if already aborted
+      if (this.abortSignal?.aborted) {
+        reject(new Error('Operation was aborted'))
+        return
+      }
+
       let stdout = ''
       let stderr = ''
 
@@ -251,6 +319,17 @@ export class Ping {
         child.kill('SIGTERM')
         reject(new Error(`Ping command timed out after ${timeout}ms`))
       }, timeout)
+
+      // Handle abort signal
+      const abortListener = () => {
+        child.kill('SIGTERM')
+        clearTimeout(timeoutId)
+        reject(new Error('Operation was aborted'))
+      }
+
+      if (this.abortSignal) {
+        this.abortSignal.addEventListener('abort', abortListener)
+      }
 
       child.stdout.on('data', (data) => {
         stdout += data.toString('utf-8')
@@ -262,6 +341,9 @@ export class Ping {
 
       child.on('close', (code, signal) => {
         clearTimeout(timeoutId)
+        if (this.abortSignal) {
+          this.abortSignal.removeEventListener('abort', abortListener)
+        }
 
         // Create a SpawnSyncReturns-like object
         const result: SpawnSyncReturns<string> = {
@@ -279,6 +361,9 @@ export class Ping {
 
       child.on('error', (error: Error) => {
         clearTimeout(timeoutId)
+        if (this.abortSignal) {
+          this.abortSignal.removeEventListener('abort', abortListener)
+        }
         reject(error)
       })
     })
@@ -331,6 +416,29 @@ export class Ping {
 
   setIPv6(): Ping {
     return this.setIPVersion(6)
+  }
+
+  /**
+   * Sets an AbortSignal for external cancellation of ping operations.
+   *
+   * @param abortSignal The AbortSignal to use for cancellation
+   * @returns This Ping instance for method chaining
+   *
+   * @example
+   * ```typescript
+   * const abortController = new AbortController()
+   * const ping = new Ping('google.com').setAbortSignal(abortController.signal)
+   *
+   * // Cancel the operation
+   * abortController.abort()
+   *
+   * // Or use timeout-based cancellation
+   * const ping2 = new Ping('google.com').setAbortSignal(AbortSignal.timeout(5000))
+   * ```
+   */
+  setAbortSignal(abortSignal: AbortSignal): Ping {
+    this.abortSignal = abortSignal
+    return this
   }
 
   buildPingCommand(): string[] {

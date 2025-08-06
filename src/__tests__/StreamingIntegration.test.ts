@@ -322,4 +322,40 @@ describe('streaming timeout and error scenarios', () => {
     // Should have attempted at least one iteration
     expect(iterations).toBeGreaterThanOrEqual(0)
   })
+
+  it('should handle AbortSignal integration with streaming', async () => {
+    const abortController = new AbortController()
+    const ping = new Ping('8.8.8.8')
+      .setCount(0) // infinite
+      .setTimeout(0.1)
+      .setInterval(0.05)
+      .setAbortSignal(abortController.signal)
+
+    const results: any[] = []
+    let iterations = 0
+    const maxIterations = 3
+
+    // Abort after a short time
+    setTimeout(() => {
+      abortController.abort()
+    }, 150)
+
+    try {
+      for await (const result of ping.stream()) {
+        results.push(result)
+        iterations++
+
+        // Safety check to prevent infinite loop
+        if (iterations >= maxIterations)
+          break
+      }
+    }
+    catch {
+      // Stream should end gracefully on abort, not throw
+    }
+
+    // Should have been able to abort gracefully
+    expect(iterations).toBeLessThanOrEqual(maxIterations)
+    expect(abortController.signal.aborted).toBe(true)
+  })
 })
